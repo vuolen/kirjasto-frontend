@@ -1,30 +1,41 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { from } from "rxjs";
-import { map } from "rxjs/operators";
+import { fromEvent } from "rxjs";
+import { ajax } from 'rxjs/ajax';
+import { map, tap } from 'rxjs/operators'
 
 const BACKEND_HOST = "http://localhost"
 const BACKEND_PORT = "8000"
 const BACKEND_BASE_URL = BACKEND_HOST + ":" + BACKEND_PORT
 
-const book$ = from(axios.get(BACKEND_BASE_URL + "/books")).pipe(
-    map(res => res.data)
-)
+const book$ = ajax.getJSON<{title: string, id: number}[]>(BACKEND_BASE_URL + "/books")
 
 const App = () => {
 
-    const [books, setBooks] = useState([])
+    const [books, setBooks] = useState([] as {title: string, id: number}[])
+    const [titleFilter, setTitleFilter] = useState("")
+    const titleFilterRef = React.createRef<HTMLInputElement>()
 
     useEffect(() => {
-        book$.subscribe(
-            setBooks,
-            err => console.log("Couldnt get /books")
-        )
+        const sub = book$.subscribe(setBooks)
+        return sub.unsubscribe
     }, [])
-    console.log(books)
+
+    useEffect(() => {
+        if (!titleFilterRef.current) return
+        const sub = fromEvent(titleFilterRef.current, "input").pipe(
+            map(ev => (ev.target as HTMLInputElement).value)
+        ).subscribe(setTitleFilter)
+        return sub.unsubscribe
+    }, [])
+
     return <div>
-        {JSON.stringify(books)}
+        <input ref={titleFilterRef} type="text"></input>
+        <ul>
+            {books
+                .filter(book => book.title.includes(titleFilter))
+                .map(book => <li key={book.id}>{book.id}: {book.title}</li>)}
+        </ul>
     </div>
 }
 
