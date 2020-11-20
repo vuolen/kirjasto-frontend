@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { fromEvent } from "rxjs";
 import { ajax } from 'rxjs/ajax';
-import { map, tap } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 
-const BACKEND_HOST = "http://localhost"
-const BACKEND_PORT = "8000"
+const BACKEND_HOST = process.env.BACKEND_HOST || "http://localhost"
+const BACKEND_PORT = process.env.BACKEND_PORT || "8000"
 const BACKEND_BASE_URL = BACKEND_HOST + ":" + BACKEND_PORT
 
 const book$ = ajax.getJSON<{title: string, id: number}[]>(BACKEND_BASE_URL + "/books")
