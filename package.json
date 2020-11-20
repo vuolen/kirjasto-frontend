@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "start": "webpack serve --mode=production",
-    "dev": "webpack serve --mode=development",
+    "production": "webpack serve --mode=production",
+    "development": "webpack serve --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
