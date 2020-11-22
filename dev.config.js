@@ -32,7 +32,11 @@ module.exports = env => ({
   devServer: {
     contentBase: './dist',
     index: 'index.html',
-    port: env.PORT,
-    hot: true
+    hot: true,
+    inline: true,
+    host: "0.0.0.0",
+    headers: {
+        "Access-Control-Allow-Origin": "*"
+    }
   }
 });
