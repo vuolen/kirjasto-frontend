@@ -30,6 +30,7 @@ const App = () => {
     }, [])
 
     return <div>
+        <h1>Kirjasto</h1>
         <input ref={titleFilterRef} type="text"></input>
         <ul>
             {books

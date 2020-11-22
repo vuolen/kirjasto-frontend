@@ -1,9 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
 
-module.exports = {
+module.exports = env => ({
+  mode: 'development',
   entry: './src/index.tsx',
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -24,7 +25,14 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       'BACKEND_HOST': 'localhost',
       'BACKEND_PORT': '8000'
+    }),
+    new webpack.HotModuleReplacementPlugin({
     })
-  ]
-
-};
+  ],
+  devServer: {
+    contentBase: './dist',
+    index: 'index.html',
+    port: env.PORT,
+    hot: true
+  }
+});
