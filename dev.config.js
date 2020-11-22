@@ -35,8 +35,6 @@ module.exports = env => ({
     hot: true,
     inline: true,
     host: "0.0.0.0",
-    headers: {
-        "Access-Control-Allow-Origin": "*"
-    }
+    "public": "frontend"
   }
 });
