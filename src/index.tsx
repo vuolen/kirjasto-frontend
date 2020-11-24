@@ -31,7 +31,7 @@ const App = () => {
 
     return <div>
         <h1>Kirjasto</h1>
-        <input ref={titleFilterRef} type="text"></input>
+        <input id="search-bar" ref={titleFilterRef} type="text"></input>
         <ul>
             {books
                 .filter(book => book.title.includes(titleFilter))
