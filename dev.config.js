@@ -35,6 +35,6 @@ module.exports = env => ({
     hot: true,
     inline: true,
     host: "0.0.0.0",
-    "public": "frontend"
+    disableHostCheck: true
   }
 });
