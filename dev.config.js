@@ -22,10 +22,9 @@ module.exports = env => ({
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
-    new webpack.EnvironmentPlugin({
-      'BACKEND_HOST': 'localhost',
-      'BACKEND_PORT': '8000'
-    }),
+    new webpack.EnvironmentPlugin([
+      'BACKEND_URL'
+    ]),
     new webpack.HotModuleReplacementPlugin({
     })
   ],
