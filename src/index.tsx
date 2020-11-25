@@ -4,9 +4,7 @@ import { fromEvent } from "rxjs";
 import { ajax } from 'rxjs/ajax';
 import { map } from 'rxjs/operators'
 
-const BACKEND_HOST = process.env.BACKEND_HOST || "localhost"
-const BACKEND_PORT = process.env.BACKEND_PORT || "8000"
-const BACKEND_BASE_URL = "http://" + BACKEND_HOST + ":" + BACKEND_PORT
+const BACKEND_BASE_URL = "http://" + process.env.BACKEND_URL
 
 const book$ = ajax.getJSON<{title: string, id: number}[]>(BACKEND_BASE_URL + "/books")
 
