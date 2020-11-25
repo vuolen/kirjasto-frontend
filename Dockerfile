@@ -1,8 +1,7 @@
-FROM node:lts-alpine
+FROM node:latest
 WORKDIR /usr/src/kirjasto-frontend
 
 COPY . .
 
 RUN npm install
 
-ENTRYPOINT ["npm"]
