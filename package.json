@@ -6,7 +6,7 @@
     "production": "webpack serve --mode=production --host 0.0.0.0 --port=${PORT}",
     "development": "webpack serve --port=${PORT} --config ./dev.config.js",
     "wait": "./wait-for-it.sh ${BACKEND_URL} -- npm run",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "exit 0"
   },
   "repository": {
     "type": "git",
