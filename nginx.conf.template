@@ -1,0 +1,7 @@
+server {
+
+    location /api/ {
+        proxy_pass http://${BACKEND_URL}/;
+    }
+    
+}

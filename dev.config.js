@@ -1,5 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = env => ({
   mode: 'development',
@@ -18,14 +20,19 @@ module.exports = env => ({
     extensions: [ '.tsx', '.ts', '.js' ],
   },
   output: {
-    filename: 'bundle.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
+    new CleanWebpackPlugin(),
     new webpack.EnvironmentPlugin([
       'BACKEND_URL'
     ]),
     new webpack.HotModuleReplacementPlugin({
+    }),
+    new HtmlWebpackPlugin({
+      title: "Kirjasto",
+      template: "src/index.html"
     })
   ],
   devServer: {
@@ -34,6 +41,13 @@ module.exports = env => ({
     hot: true,
     inline: true,
     host: "0.0.0.0",
-    disableHostCheck: true
+    disableHostCheck: true,
+    proxy: {
+      "/api": {
+        target: "http://" + process.env.BACKEND_URL,
+        pathRewrite: {'^/api' : ''}
+      }
+    },
+    historyApiFallback: true
   }
 });
