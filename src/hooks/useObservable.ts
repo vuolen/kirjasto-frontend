@@ -6,6 +6,7 @@ const useObservable = <T> (observable: Observable<T>, deps?: any[]) => {
     
     useEffect(() => {
         const sub = observable.subscribe(setValue)
+        console.log("USEEFFECT")
         return () => sub.unsubscribe()
     }, deps)
 
