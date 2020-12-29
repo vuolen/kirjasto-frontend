@@ -5,7 +5,6 @@
   "scripts": {
     "build": "webpack --config prod.config.js",
     "development": "webpack serve --port=${PORT} --config ./dev.config.js",
-    "wait": "./wait-for-it.sh ${BACKEND_URL} -- npm run",
     "test": "exit 0"
   },
   "repository": {
