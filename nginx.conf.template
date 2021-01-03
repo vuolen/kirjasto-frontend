@@ -1,4 +1,9 @@
 server {
+    listen ${PORT};
+    
+    location / {
+        root /usr/share/nginx/html;
+    }
 
     location /api/ {
         proxy_pass http://${BACKEND_URL}/;
