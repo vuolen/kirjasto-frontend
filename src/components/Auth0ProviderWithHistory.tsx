@@ -16,7 +16,7 @@ const Auth0ProviderWithHistory = ({ children }: any) => {
       clientId="kCcOfUimwS5lOzXWBzZyuG6I11ZqDghb"
       redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
-      audience="localhost:8000">
+      audience={process.env.BACKEND_URL}>
 
       {children}
     </Auth0Provider>

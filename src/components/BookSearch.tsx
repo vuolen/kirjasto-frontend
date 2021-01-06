@@ -1,37 +1,47 @@
-import { useAuth0 } from "@auth0/auth0-react"
-import React, { useEffect, useState } from "react"
-import { BehaviorSubject, combineLatest, defer, forkJoin, from, fromEvent, Observable, of, Subject } from "rxjs"
-import { ajax } from "rxjs/ajax"
-import { concatMap, filter, last, map, shareReplay, tap, toArray, withLatestFrom } from "rxjs/operators"
+import React, { useState } from "react"
+import { BehaviorSubject, combineLatest, Observable } from "rxjs"
+import { filter, map, tap } from "rxjs/operators"
+import { Api, GetBooksResponse, isAPIError } from "../api"
 import useObservable from "../hooks/useObservable"
+import { Loading } from "./Loading"
 
-const book$ = ajax.getJSON<{title: string, id: number}[]>("api/books").pipe(
-    shareReplay(1)
-)
-
-const BookSearch = () => {    
+const BookSearch = ({api$}: {api$: Observable<Api>}) => {    
 
     const [filter$] = useState(new BehaviorSubject(""))
-    const [filter] = useObservable(filter$, [filter$])
+    const titleFilter = useObservable(filter$, [filter$])
+    const api = useObservable(api$)
+
+    if (titleFilter === undefined || api === undefined) {
+        return <Loading />
+    }
+
+    const {getBooks} = api
+
+    const book$ = getBooks().pipe(
+        filter((res): res is GetBooksResponse => !isAPIError(res))
+    )
 
     return <div>
         <h1>Kirjasto</h1>
-        <input onChange={ev => filter$.next(ev.target.value)} type="text" id="search-bar" value={filter || ""}></input>
+        <input onChange={ev => filter$.next(ev.target.value)} type="text" id="search-bar" value={titleFilter}></input>
         <BookList book$={book$} filter$={filter$} />
     </div>
 }
 
 const BookList = ({book$, filter$}: {book$: Observable<{title: string, id: number}[]>, filter$: Observable<string>}) => {
-    const [filteredBooks] = useObservable(
+    const filteredBooks = useObservable(
         combineLatest([book$, filter$]).pipe(
             map(([books, latestFilter]) => books.filter(
                 book => book.title.includes(latestFilter)
             ).map(
                 book => <BookItem key={book.id} book={book} />
             ))
-        ),
-        [book$, filter$]
+        )
     )
+
+    if (filteredBooks === undefined) {
+        return <Loading />
+    }
 
     return (
         <ul>

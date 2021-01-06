@@ -3,14 +3,17 @@ import { Observable } from "rxjs"
 
 const useObservable = <T> (observable: Observable<T>, deps?: any[]) => {
     const [value, setValue] = useState<T>()
+
+    if (deps === undefined) {
+        deps = []
+    }
     
     useEffect(() => {
         const sub = observable.subscribe(setValue)
-        console.log("USEEFFECT")
         return () => sub.unsubscribe()
-    }, deps)
+    }, [...deps])
 
-    return [value]
+    return value
 }
 
 export default useObservable

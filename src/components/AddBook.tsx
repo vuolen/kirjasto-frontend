@@ -4,13 +4,22 @@ import { FormEvent } from "react"
 import { BehaviorSubject, Observable, Subject } from "rxjs"
 import { ajax } from "rxjs/ajax"
 import { concatMap, filter, map, tap } from "rxjs/operators"
-import { addBook, APIError, isAPIError } from "../api"
+import { useApi, APIError, isAPIError, Api } from "../api"
 import useObservable from "../hooks/useObservable"
+import { Loading } from "./Loading"
 
 
-const AddBook = () => {
+const AddBook = ({api$}: {api$: Observable<Api>}) => {
 
     const [submit$] = useState(new Subject<FormEvent>())
+    const api = useObservable(api$)
+    const [title, setTitle] = useState("")
+
+    if (api === undefined) {
+        return <Loading />
+    }
+
+    const {addBook} = api
 
     const response$ = submit$.pipe(
         tap(ev => ev.preventDefault()),
@@ -22,8 +31,6 @@ const AddBook = () => {
         filter((res: any) => isAPIError(res)),
         map((res: APIError) => res.error)
     )
-
-    const [title, setTitle] = useState("")
 
     const onSubmit = (ev: FormEvent) => {
 
@@ -43,9 +50,7 @@ const AddBook = () => {
 }
 
 const ErrorMessage = ({error$}: {error$: Observable<string>}) => {
-    const [error] = useObservable(error$.pipe(
-
-    ), [error$])
+    const error = useObservable(error$)
 
     return (
         <div id="error">
