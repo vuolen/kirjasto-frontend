@@ -23,6 +23,9 @@ module.exports = env => ({
   },
   plugins: [
     new CleanWebpackPlugin(),
+    new webpack.EnvironmentPlugin([
+      'BACKEND_URL'
+    ]),
     new HtmlWebpackPlugin({
       title: "Kirjasto",
       template: "src/index.html"

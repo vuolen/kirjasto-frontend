@@ -1,6 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { BACKEND_URL } from "../config";
 
 const Auth0ProviderWithHistory = ({ children }: any) => {
 
@@ -16,7 +17,7 @@ const Auth0ProviderWithHistory = ({ children }: any) => {
       clientId="kCcOfUimwS5lOzXWBzZyuG6I11ZqDghb"
       redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
-      audience={process.env.BACKEND_URL}>
+      audience={BACKEND_URL}>
 
       {children}
     </Auth0Provider>

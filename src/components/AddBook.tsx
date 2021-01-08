@@ -10,7 +10,6 @@ import { Loading } from "./Loading"
 
 
 const AddBook = ({api$}: {api$: Observable<Api>}) => {
-
     const [submit$] = useState(new Subject<FormEvent>())
     const api = useObservable(api$)
     const [title, setTitle] = useState("")
@@ -31,12 +30,6 @@ const AddBook = ({api$}: {api$: Observable<Api>}) => {
         filter((res: any) => isAPIError(res)),
         map((res: APIError) => res.error)
     )
-
-    const onSubmit = (ev: FormEvent) => {
-
-        setTitle("")
-        ev.preventDefault()
-    }
 
     return <div>
         <h2>Add a new book</h2>
