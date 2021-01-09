@@ -9,7 +9,7 @@ const BookSearch = ({api$}: {api$: Observable<Api>}) => {
 
     const [filter$] = useState(new BehaviorSubject(""))
     const titleFilter = useObservable(filter$, [filter$])
-    const api = useObservable(api$)
+    const api = useObservable(api$, [api$])
 
     if (titleFilter === undefined || api === undefined) {
         return <Loading />
@@ -36,7 +36,8 @@ const BookList = ({book$, filter$}: {book$: Observable<{title: string, id: numbe
             ).map(
                 book => <BookItem key={book.id} book={book} />
             ))
-        )
+        ),
+        [book$, filter$]
     )
 
     if (filteredBooks === undefined) {

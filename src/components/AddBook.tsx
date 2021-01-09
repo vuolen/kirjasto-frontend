@@ -11,7 +11,7 @@ import { Loading } from "./Loading"
 
 const AddBook = ({api$}: {api$: Observable<Api>}) => {
     const [submit$] = useState(new Subject<FormEvent>())
-    const api = useObservable(api$)
+    const api = useObservable(api$, [api$])
     const [title, setTitle] = useState("")
 
     if (api === undefined) {
@@ -43,7 +43,7 @@ const AddBook = ({api$}: {api$: Observable<Api>}) => {
 }
 
 const ErrorMessage = ({error$}: {error$: Observable<string>}) => {
-    const error = useObservable(error$)
+    const error = useObservable(error$, [error$])
 
     return (
         <div id="error">
