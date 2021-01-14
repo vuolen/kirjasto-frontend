@@ -1,8 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
-import { Observable, of, ReplaySubject, Subject, throwError } from "rxjs";
+import { BehaviorSubject, from, Observable, of, ReplaySubject, Subject, throwError } from "rxjs";
 import { ajax } from "rxjs/ajax";
-import { catchError, map } from "rxjs/operators";
+import { catchError, concatMap, map } from "rxjs/operators";
 import AddBook from "./components/AddBook";
 
 export type APIError = {error: string}
@@ -13,23 +13,24 @@ export function isAPIError(response: any): response is APIError {
 
 export interface Api {
     getBooks: () => Observable<APIError | GetBooksResponse>
+}
+
+export interface AuthenticatedApi extends Api {
     addBook: (params: AddBookRequest) => Observable<APIError | AddBookResponse>
 }
 
 export type GetBooksResponse = {id: number, title: string}[]
-const getBooks = () => {
-    console.log("getbooks")
-    return ajax.getJSON<APIError | GetBooksResponse>("api/books")
-}
+const getBooks = () => 
+    ajax.getJSON<APIError | GetBooksResponse>("api/books")
 
 type AddBookRequest = {title: string}
 type AddBookResponse = {id: number, title: string}
-const addBook = (token: string) => (params: {title: string}): Observable<APIError | {id: number, title: string}> => {
-    return ajax.post(
+const addBook = (token: string) => (params: {title: string}): Observable<APIError | {id: number, title: string}> => 
+    ajax.post(
         "/api/books/",
         params,
         {"Content-Type": "application/json",
-         "authorization": token}
+         "Authorization": "Bearer " + token}
     ).pipe(
         map(
             response => response.response
@@ -41,34 +42,29 @@ const addBook = (token: string) => (params: {title: string}): Observable<APIErro
             }
         )
     )
-}
 
-export function useApi() {
-    const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+export function useApi(): {api$: Observable<Api | AuthenticatedApi>, isAuthenticated: boolean, isLoading: boolean} {
+    const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
 
-    const [api$] = useState(new ReplaySubject<Api>(1))
+    const [baseApi$] = useState(new BehaviorSubject<Api>({
+        getBooks
+    }))
 
-    useEffect(() => {
-        (async () => {
-            
-            let token
+    if (!isAuthenticated) {
+        return {api$: baseApi$, isAuthenticated, isLoading}
+    }
 
-            if (isAuthenticated) {
-                token = await getAccessTokenSilently({
-                    scope: 'add:books'
-                })
-            } else {
-                token = "not authenticated" // TODO: do this more gracefully
-            }
-
-            api$.next(
-                {
-                    getBooks: getBooks,
+    const authenticatedApi$ = baseApi$.pipe(
+        concatMap(baseApi => 
+            from(getAccessTokenSilently({
+                scope: 'add:book'
+            })).pipe(
+                map(token => ({
                     addBook: addBook(token)
-                }
+                })),
+                map(authenticatedApi => ({...baseApi, ...authenticatedApi}))
             )
-        })()
-    }, [getAccessTokenSilently])
+    ))
 
-    return api$
+    return {api$: authenticatedApi$, isAuthenticated, isLoading}
 }

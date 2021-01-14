@@ -42,6 +42,7 @@ module.exports = env => ({
     inline: true,
     host: "0.0.0.0",
     disableHostCheck: true,
+    https: true,
     proxy: {
       "/api": {
         target: "http://" + process.env.BACKEND_URL,

@@ -4,12 +4,12 @@ import { FormEvent } from "react"
 import { BehaviorSubject, Observable, Subject } from "rxjs"
 import { ajax } from "rxjs/ajax"
 import { concatMap, filter, map, tap } from "rxjs/operators"
-import { useApi, APIError, isAPIError, Api } from "../api"
+import { useApi, APIError, isAPIError, Api, AuthenticatedApi } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
 
 
-const AddBook = ({api$}: {api$: Observable<Api>}) => {
+const AddBook = ({api$}: {api$: Observable<AuthenticatedApi>}) => {
     const [submit$] = useState(new Subject<FormEvent>())
     const api = useObservable(api$, [api$])
     const [title, setTitle] = useState("")

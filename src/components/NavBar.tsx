@@ -1,13 +1,14 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import React from "react"
 import { Link } from "react-router-dom"
+import { Loading } from "./Loading";
 
 const NavBar = () => {
 
     const {isAuthenticated, isLoading, user, loginWithRedirect, logout} = useAuth0();
 
     if (isLoading) {
-        return <div>Loading ...</div>;
+        return <Loading />;
     }
 
     return (<nav>
