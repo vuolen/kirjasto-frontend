@@ -9,7 +9,7 @@ import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
 
 
-const AddBook = ({api$}: {api$: Observable<AuthenticatedApi>}) => {
+const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) => {
     const [submit$] = useState(new Subject<FormEvent>())
     const api = useObservable(api$, [api$])
     const [title, setTitle] = useState("")
