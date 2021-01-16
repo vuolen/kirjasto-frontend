@@ -23,6 +23,7 @@ const BookSearch = ({api$}: {api$: Observable<Api>}) => {
 
     return <div>
         <h1>Kirjasto</h1>
+        <label htmlFor="search-bar">Search:</label>
         <input onChange={ev => filter$.next(ev.target.value)} type="text" id="search-bar" value={titleFilter}></input>
         <BookList book$={book$} filter$={filter$} />
     </div>
