@@ -1,18 +1,17 @@
-import { Auth0Provider, useAuth0 } from "@auth0/auth0-react"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { FormEvent } from "react"
-import { BehaviorSubject, Observable, Subject } from "rxjs"
-import { ajax } from "rxjs/ajax"
-import { concatMap, filter, map, tap } from "rxjs/operators"
-import { useApi, APIError, isAPIError, Api, AuthenticatedApi } from "../api"
+import { Observable, Subject } from "rxjs"
+import { concatMap, filter, map, tap, withLatestFrom } from "rxjs/operators"
+import { APIError, isAPIError, AuthenticatedApi } from "../api"
 import useObservable from "../hooks/useObservable"
+import { useObservableInput } from "../hooks/useObservableInput"
 import { Loading } from "./Loading"
-
 
 const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) => {
     const [submit$] = useState(new Subject<FormEvent>())
+    const [title$, titleInput] = useObservableInput({name: "title", id: "title"})
+    const [author$, authorInput] = useObservableInput({name: "author", id: "author"})
     const api = useObservable(api$, [api$])
-    const [title, setTitle] = useState("")
 
     if (api === undefined) {
         return <Loading />
@@ -22,8 +21,14 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) 
 
     const response$ = submit$.pipe(
         tap(ev => ev.preventDefault()),
-        concatMap(() => addBook({title})),
-        tap(() => setTitle(""))
+        withLatestFrom(title$, author$),
+        concatMap(([_, title, author]) => 
+            addBook({
+                title, 
+                author: author === "" ? undefined : author
+            })),
+        tap(() => title$.next("")),
+        tap(() => author$.next(""))
     )
 
     const error$ = response$.pipe(
@@ -36,7 +41,9 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) 
         <ErrorMessage error$={error$} />
         <form onSubmit={ev => submit$.next(ev)}>
             <label htmlFor="title">Title:</label>
-            <input onChange={ev => setTitle(ev.target.value)} type="text" name="title" id="title" value={title}></input>
+            {titleInput}
+            <label htmlFor="author">Author:</label>
+            {authorInput}
             <input type="submit" id="submit" value="Add"></input>
         </form>
     </div>

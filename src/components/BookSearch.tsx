@@ -29,7 +29,7 @@ const BookSearch = ({api$}: {api$: Observable<Api>}) => {
     </div>
 }
 
-const BookList = ({book$, filter$}: {book$: Observable<{title: string, id: number}[]>, filter$: Observable<string>}) => {
+const BookList = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filter$: Observable<string>}) => {
     const filteredBooks = useObservable(
         combineLatest([book$, filter$]).pipe(
             map(([books, latestFilter]) => books.filter(
@@ -52,9 +52,9 @@ const BookList = ({book$, filter$}: {book$: Observable<{title: string, id: numbe
     )
 }
 
-const BookItem = ({book}: {book: {title: string, id: number}}) => (
+const BookItem = ({book}: {book: {title: string, author?: string}}) => (
     <li>
-        {book.id}: {book.title}
+        {book.author === undefined ? "" : book.author + ":"} {book.title}
     </li>
 )
 

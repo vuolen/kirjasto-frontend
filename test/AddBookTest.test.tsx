@@ -26,6 +26,26 @@ it("AddBook clears the title input after submitting", () => {
     expect(titleInput.value).toBe("")
 })
 
+
+it("AddBook clears the author input after submitting", () => {
+    const result = render(
+        <AddBook api$={of({addBook: () => of({id: 1, title: "Test Book"})})}></AddBook>
+    )
+
+    const authorInput = result.getByLabelText(/Author/i) as HTMLInputElement
+    fireEvent.change(authorInput, {target: {value: "Test Testersson"}})
+    submitForm(result)
+
+    expect(authorInput.value).toBe("")
+})
+
+it("AddBook has author input", () => {
+    const result = render(
+        <AddBook api$={of({addBook: () => of({id: 1, title: "Test Book"})})}></AddBook>
+    )
+    expect(result.getByLabelText(/Author/i)).toBeTruthy()
+})
+
 it("AddBook calls the api on submit", () => {
     const addBookMock = jest.fn(() => of({id: 1, title: "Test Book"}))
 
