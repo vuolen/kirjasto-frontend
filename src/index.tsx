@@ -10,6 +10,8 @@ import { Loading } from "./components/Loading"
 import NavBar from "./components/NavBar"
 import PathNotFound from "./components/PathNotFound"
 
+import 'semantic-ui-css/semantic.min.css'
+
 const App = () => {
 
     const { loginWithRedirect } = useAuth0()

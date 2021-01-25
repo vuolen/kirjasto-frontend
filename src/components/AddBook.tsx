@@ -1,16 +1,20 @@
-import React, { useState } from "react"
+import React, { Component, useState } from "react"
+import { FunctionComponent } from "react"
 import { FormEvent } from "react"
-import { Observable, Subject } from "rxjs"
-import { concatMap, filter, map, tap, withLatestFrom } from "rxjs/operators"
+import { BehaviorSubject, merge, Observable, Subject } from "rxjs"
+import { concatMap, filter, map, mapTo, startWith, tap, withLatestFrom } from "rxjs/operators"
+import { Form, FormInputProps, Message, MessageProps } from "semantic-ui-react"
+import { SemanticCOLORS } from "semantic-ui-react/dist/commonjs/generic"
 import { APIError, isAPIError, AuthenticatedApi } from "../api"
 import useObservable from "../hooks/useObservable"
 import { useObservableInput } from "../hooks/useObservableInput"
+import { withObservableProps } from "../util"
 import { Loading } from "./Loading"
 
 const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) => {
     const [submit$] = useState(new Subject<FormEvent>())
-    const [title$, titleInput] = useObservableInput({name: "title", id: "title"})
-    const [author$, authorInput] = useObservableInput({name: "author", id: "author"})
+    const [title$] = useState(new BehaviorSubject<string>(""))
+    const [author$] = useState(new BehaviorSubject<string>(""))
     const api = useObservable(api$, [api$])
 
     if (api === undefined) {
@@ -26,37 +30,46 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) 
             addBook({
                 title, 
                 author: author === "" ? undefined : author
-            })),
+            })
+        ),
         tap(() => title$.next("")),
         tap(() => author$.next(""))
     )
 
-    const error$ = response$.pipe(
-        filter((res: any) => isAPIError(res)),
-        map((res: APIError) => res.error)
+    const messageProp$ = merge(
+        submit$.pipe(
+            mapTo({id: "error", hidden: true})
+        ),
+        response$.pipe(
+            filter((res: any) => isAPIError(res)),
+            map((res: APIError) => ({
+                id: "error",
+                error: true,
+                color: "red" as SemanticCOLORS,
+                content: res.error
+            })),
+            startWith({id: "error", hidden: true})
+        )
     )
 
     return <div>
         <h2>Add a new book</h2>
-        <ErrorMessage error$={error$} />
-        <form onSubmit={ev => submit$.next(ev)}>
-            <label htmlFor="title">Title:</label>
-            {titleInput}
-            <label htmlFor="author">Author:</label>
-            {authorInput}
+        
+        <Form error onSubmit={ev => submit$.next(ev)}>
+            <ObservableMessage prop$={messageProp$} />
+            <ObservableInput value$={title$} id="title" label="Title:" name="title" />
+            <ObservableInput value$={author$} id="author" label="Author:" name="author" />
             <input type="submit" id="submit" value="Add"></input>
-        </form>
+        </Form>
     </div>
 }
 
-const ErrorMessage = ({error$}: {error$: Observable<string>}) => {
-    const error = useObservable(error$, [error$])
-
-    return (
-        <div id="error">
-            {error}
-        </div>
-    )
+const ObservableInput = ({value$, ...args}: {value$: Subject<string>} & FormInputProps) => {
+    const value = useObservable(value$, [value$])
+    return <Form.Input onChange={ev => value$.next(ev.target.value)} value={value || ""} {...args} />
 }
+
+const ObservableMessage = withObservableProps(Message)
+
 
 export default AddBook
