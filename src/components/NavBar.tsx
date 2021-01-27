@@ -1,6 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import React from "react"
 import { Link } from "react-router-dom"
+import { Button, ButtonProps, Menu } from "semantic-ui-react";
 import { Loading } from "./Loading";
 
 const NavBar = () => {
@@ -11,29 +12,34 @@ const NavBar = () => {
         return <Loading />;
     }
 
-    return (<nav>
-        <Link to="/">Home</Link>
-        <Link to="/addBook">Add book</Link>
+    return (
+      <Menu>
+        <Menu.Item as={Link} to="/">Home</Menu.Item>
+        <Menu.Item as={Link} to="/addBook">Add book</Menu.Item>
         
         {isAuthenticated ?
             <LogoutButton /> : <LoginButton />}
-    </nav>)
+      </Menu>)
 }
 
 
-const LoginButton = () => {
+const LoginButton = (props: ButtonProps) => {
     const { loginWithRedirect } = useAuth0();
   
-    return <button id="login" onClick={() => loginWithRedirect()}>Log In</button>;
+    return (
+      <Button {...props} id="login" onClick={() => loginWithRedirect()}>
+        Log In
+      </Button>
+    );
 };
 
-const LogoutButton = () => {
+const LogoutButton = (props: ButtonProps) => {
     const { logout } = useAuth0();
   
     return (
-      <button id="logout" onClick={() => logout({ returnTo: window.location.origin })}>
+      <Button {...props} floated="right" id="logout" onClick={() => logout({ returnTo: window.location.origin })}>
         Log Out
-      </button>
+      </Button>
     );
   };
 
