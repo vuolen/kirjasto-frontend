@@ -18,11 +18,8 @@
   },
   "homepage": "https://github.com/vuolen/kirjasto-frontend#readme",
   "devDependencies": {
-    "@testing-library/react": "^11.2.3",
     "@types/axios": "^0.14.0",
     "@types/jest": "^26.0.20",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.1.7",
     "@types/webpack": "^4.41.26",
     "css-loader": "^5.0.1",
@@ -36,6 +33,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.2.0",
+    "@testing-library/react": "^11.2.3",
     "axios": "^0.21.1",
     "clean-webpack-plugin": "^3.0.0",
     "compression-webpack-plugin": "^7.1.2",

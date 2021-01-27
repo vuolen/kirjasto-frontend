@@ -1,6 +1,6 @@
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react"
-import React from "react"
-import ReactDOM from "react-dom"
+import React from "preact/compat"
+import ReactDOM from "preact/compat"
 import { BrowserRouter, Route, Switch } from "react-router-dom"
 import { useApi } from "./api"
 import AddBook from "./components/AddBook"
@@ -15,9 +15,6 @@ import 'semantic-ui-css/components/message.min.css'
 import 'semantic-ui-css/components/form.min.css'
 import 'semantic-ui-css/components/menu.min.css'
 import 'semantic-ui-css/components/site.min.css'
-
-
-
 
 const App = () => {
 
@@ -53,5 +50,5 @@ ReactDOM.render(
             <App />
         </Auth0ProviderWithHistory>
     </BrowserRouter>, 
-    document.getElementById("root")
+    document.getElementById("root")!
 )

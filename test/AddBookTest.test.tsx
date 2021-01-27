@@ -1,5 +1,4 @@
-import { RenderResult } from "@testing-library/react"
-import { fireEvent, getByText, render } from "@testing-library/react"
+import { RenderResult, fireEvent, render } from "@testing-library/react"
 import React from "react"
 import { Observable, of } from "rxjs"
 import { AuthenticatedApi } from "../src/api"
@@ -7,7 +6,7 @@ import AddBook from "../src/components/AddBook"
 
 function inputTitle(res: RenderResult, title: string) {
     const titleInput = res.getByLabelText(/Title/i) as HTMLInputElement
-    fireEvent.change(titleInput, {target: {value: title}})
+    fireEvent.input(titleInput, {target: {value: title}})
     expect(titleInput.value).toBe(title)
     return titleInput
 }
@@ -33,7 +32,7 @@ it("AddBook clears the author input after submitting", () => {
     )
 
     const authorInput = result.getByLabelText(/Author/i) as HTMLInputElement
-    fireEvent.change(authorInput, {target: {value: "Test Testersson"}})
+    fireEvent.input(authorInput, {target: {value: "Test Testersson"}})
     submitForm(result)
 
     expect(authorInput.value).toBe("")

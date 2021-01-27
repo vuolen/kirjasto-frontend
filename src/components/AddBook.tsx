@@ -8,6 +8,7 @@ import { APIError, isAPIError, AuthenticatedApi } from "../api"
 import useObservable from "../hooks/useObservable"
 import { withObservableProps } from "../util"
 import { Loading } from "./Loading"
+import { ObservableInput } from "./ObservableInput"
 
 const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) => {
     const [submit$] = useState(new Subject<FormEvent>())
@@ -60,11 +61,6 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) 
             <input type="submit" id="submit" value="Add"></input>
         </Form>
     </div>
-}
-
-const ObservableInput = ({value$, ...args}: {value$: Subject<string>} & FormInputProps) => {
-    const value = useObservable(value$, [value$])
-    return <Form.Input onChange={ev => value$.next(ev.target.value)} value={value || ""} {...args} />
 }
 
 const ObservableMessage = withObservableProps(Message)
