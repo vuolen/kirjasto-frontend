@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { BehaviorSubject, combineLatest, Observable } from "rxjs"
 import { filter, map, tap } from "rxjs/operators"
+import { List, Table } from "semantic-ui-react"
 import { Api, GetBooksResponse, isAPIError } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
@@ -25,11 +26,11 @@ const BookSearch = ({api$}: {api$: Observable<Api>}) => {
         <h1>Kirjasto</h1>
         <label htmlFor="search-bar">Search:</label>
         <input onChange={ev => filter$.next(ev.target.value)} type="text" id="search-bar" value={titleFilter}></input>
-        <BookList book$={book$} filter$={filter$} />
+        <BookTable book$={book$} filter$={filter$} />
     </div>
 }
 
-const BookList = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filter$: Observable<string>}) => {
+const BookTable = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filter$: Observable<string>}) => {
     const filteredBooks = useObservable(
         combineLatest([book$, filter$]).pipe(
             map(([books, latestFilter]) => books.filter(
@@ -45,17 +46,31 @@ const BookList = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filter
         return <Loading />
     }
 
+
     return (
-        <ul>
-            {filteredBooks && filteredBooks.length > 0 ? filteredBooks : "No books found"}
-        </ul>
+        <Table celled>
+            <Table.Header>
+                <Table.Row>
+                    <Table.HeaderCell>
+                        Title
+                    </Table.HeaderCell>
+                    <Table.HeaderCell>
+                        Author
+                    </Table.HeaderCell>
+                </Table.Row>
+            </Table.Header>
+            <Table.Body>
+                {filteredBooks}
+            </Table.Body>
+        </Table>
     )
 }
 
 const BookItem = ({book}: {book: {title: string, author?: string}}) => (
-    <li>
-        {book.author === undefined ? "" : book.author + ":"} {book.title}
-    </li>
+    <Table.Row data-se="book">
+        <Table.Cell data-se="title">{book.title}</Table.Cell>
+        <Table.Cell data-se="author">{book.author}</Table.Cell>
+    </Table.Row>
 )
 
 export default BookSearch
