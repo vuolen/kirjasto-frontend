@@ -4,7 +4,6 @@ import useObservable from "./hooks/useObservable"
 
 export const withObservableProps = <T, E>(componentClass: React.ComponentClass<T, E>) => ({prop$}: {prop$: Observable<T>}) => {
     const props = useObservable(prop$, [prop$])
-    console.log(props)
     return (
         React.createElement(componentClass, props)
     )

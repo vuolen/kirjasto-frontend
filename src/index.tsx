@@ -10,7 +10,14 @@ import { Loading } from "./components/Loading"
 import NavBar from "./components/NavBar"
 import PathNotFound from "./components/PathNotFound"
 
-import 'semantic-ui-css/semantic.min.css'
+import 'semantic-ui-css/components/table.min.css'
+import 'semantic-ui-css/components/message.min.css'
+import 'semantic-ui-css/components/form.min.css'
+import 'semantic-ui-css/components/menu.min.css'
+import 'semantic-ui-css/components/site.min.css'
+
+
+
 
 const App = () => {
 
