@@ -19,13 +19,14 @@ export interface AuthenticatedApi extends Api {
     addBook: (params: AddBookRequest) => Observable<APIError | AddBookResponse>
 }
 
-export type GetBooksResponse = {id: number, title: string, author?: string}[]
+export type Book = {id: number, title: string, author?: {id: number, name: string}}
+export type GetBooksResponse = {id: number, title: string, author?: {id: number, name: string}}[]
 const getBooks = () => 
     ajax.getJSON<APIError | GetBooksResponse>("api/books")
 
-type AddBookRequest = {title: string, author?: string}
-type AddBookResponse = {id: number, title: string}
-const addBook = (token: string) => (params: {title: string}): Observable<APIError | {id: number, title: string}> => 
+type AddBookRequest = {title: string, author?: number | {name: string}}
+type AddBookResponse = {id: number, title: string, author?: {id: number, title: string}}
+const addBook = (token: string) => (params: AddBookRequest): Observable<APIError | AddBookResponse> => 
     ajax.post(
         "/api/books/",
         params,

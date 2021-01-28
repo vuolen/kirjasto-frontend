@@ -28,7 +28,7 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) 
         concatMap(([_, title, author]) => 
             addBook({
                 title, 
-                author: author === "" ? undefined : author
+                author: author === "" ? undefined : {name: author}
             })
         ),
         tap(() => title$.next("")),
