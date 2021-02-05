@@ -5,5 +5,12 @@ import useObservable from "../hooks/useObservable"
 
 export const ObservableInput = ({value$, ...args}: {value$: Subject<string>} & FormInputProps) => {
     const value = useObservable(value$, [value$])
-    return <Form.Input onChange={ev => value$.next(ev.target.value)} value={value || ""} {...args} />
+
+    const {"data-cy": data_cy, ...rest} = args
+
+    return (
+        <Form.Input onChange={ev => value$.next(ev.target.value)} value={value || ""} {...rest}>
+            <input data-cy={data_cy}></input>
+        </Form.Input>
+    )
 }

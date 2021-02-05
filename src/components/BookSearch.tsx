@@ -50,7 +50,7 @@ const BookTable = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filte
 
 
     return (
-        <Table celled>
+        <Table celled data-cy="books">
             <Table.Header>
                 <Table.Row>
                     <Table.HeaderCell>
@@ -69,9 +69,9 @@ const BookTable = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filte
 }
 
 const BookItem = ({book}: {book: Book}) => (
-    <Table.Row data-se="book">
-        <Table.Cell data-se="title">{book.title}</Table.Cell>
-        <Table.Cell data-se="author">{book.author ? book.author.name : ""}</Table.Cell>
+    <Table.Row data-cy="book">
+        <Table.Cell data-cy="title">{book.title}</Table.Cell>
+        <Table.Cell data-cy="author">{book.author ? book.author.name : ""}</Table.Cell>
     </Table.Row>
 )
 

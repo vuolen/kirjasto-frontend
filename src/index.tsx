@@ -1,4 +1,4 @@
-import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react"
+import { useAuth0 } from "./hooks/useAuth0"
 import React from "preact/compat"
 import ReactDOM from "preact/compat"
 import { BrowserRouter, Route, Switch } from "react-router-dom"

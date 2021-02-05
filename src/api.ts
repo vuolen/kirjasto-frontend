@@ -1,9 +1,9 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { BehaviorSubject, from, Observable, of, ReplaySubject, Subject, throwError } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { catchError, concatMap, map } from "rxjs/operators";
 import AddBook from "./components/AddBook";
+import { useAuth0 } from "./hooks/useAuth0";
 
 export type APIError = {error: string}
 
@@ -51,21 +51,29 @@ export function useApi(): {api$: Observable<Api | AuthenticatedApi>, isAuthenti
         getBooks
     }))
 
-    if (!isAuthenticated) {
+    const e2eToken = window.localStorage.getItem("access_token")
+
+    if (!isAuthenticated && e2eToken === null) {
         return {api$: baseApi$, isAuthenticated, isLoading}
     }
 
     const authenticatedApi$ = baseApi$.pipe(
-        concatMap(baseApi => 
-            from(getAccessTokenSilently({
+        concatMap(baseApi => {
+
+            return (e2eToken !== null ? of(e2eToken) : from(getAccessTokenSilently({
                 scope: 'add:book'
-            })).pipe(
+            }))).pipe(
                 map(token => ({
                     addBook: addBook(token)
                 })),
                 map(authenticatedApi => ({...baseApi, ...authenticatedApi}))
             )
+        }
     ))
 
-    return {api$: authenticatedApi$, isAuthenticated, isLoading}
+    return {
+        api$: authenticatedApi$, 
+        isAuthenticated,
+        isLoading
+    }
 }

@@ -1,4 +1,4 @@
-import { useAuth0 } from "@auth0/auth0-react"
+import { useAuth0 } from "../hooks/useAuth0"
 import React from "react"
 import { Link } from "react-router-dom"
 import { Button, ButtonProps, Menu } from "semantic-ui-react";

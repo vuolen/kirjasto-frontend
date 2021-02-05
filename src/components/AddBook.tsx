@@ -45,6 +45,7 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) 
                 id: "error",
                 error: true,
                 color: "red" as SemanticCOLORS,
+                "data-cy": "message",
                 content: res.error
             })),
             startWith({id: "error", hidden: true})
@@ -56,9 +57,9 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) 
         
         <Form error onSubmit={ev => submit$.next(ev)}>
             <ObservableMessage prop$={messageProp$} />
-            <ObservableInput value$={title$} id="title" label="Title:" name="title" />
-            <ObservableInput value$={author$} id="author" label="Author:" name="author" />
-            <input type="submit" id="submit" value="Add"></input>
+            <ObservableInput value$={title$} data-cy="title" label="Title:" name="title" />
+            <ObservableInput value$={author$} data-cy="author" label="Author:" name="author" />
+            <input data-cy="submit" type="submit" value="Add"></input>
         </Form>
     </div>
 }
