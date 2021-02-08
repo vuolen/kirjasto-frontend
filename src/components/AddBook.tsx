@@ -57,8 +57,8 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) 
         
         <Form error onSubmit={ev => submit$.next(ev)}>
             <ObservableMessage prop$={messageProp$} />
-            <ObservableInput value$={title$} data-cy="title" label="Title:" name="title" />
-            <ObservableInput value$={author$} data-cy="author" label="Author:" name="author" />
+            <ObservableInput value$={title$} data-cy="title" id="title" label="Title:" name="title" />
+            <ObservableInput value$={author$} data-cy="author" id="author" label="Author:" name="author" />
             <input data-cy="submit" type="submit" value="Add"></input>
         </Form>
     </div>
