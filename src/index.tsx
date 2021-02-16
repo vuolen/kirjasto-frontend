@@ -18,6 +18,7 @@ import 'semantic-ui-css/components/form.min.css'
 import 'semantic-ui-css/components/menu.min.css'
 import 'semantic-ui-css/components/dropdown.min.css' */
 import 'semantic-ui-css/semantic.min.css'
+import { Container } from "semantic-ui-react"
 
 const App = () => {
 
@@ -38,11 +39,13 @@ const App = () => {
     return (
         <React.Fragment>
             <NavBar />
-            <Switch>
-                <Route exact path="/" render={() => <BookSearch api$={api$} />} />
-                <ProtectedRoute path="/addBook" component={AddBook} /> {/* TODO: Make more elegant */}
-                <Route path="*" status={404} component={PathNotFound} />
-            </Switch>
+            <Container>
+                <Switch>
+                    <Route exact path="/" render={() => <BookSearch api$={api$} />} />
+                    <ProtectedRoute path="/addBook" component={AddBook} /> {/* TODO: Make more elegant */}
+                    <Route path="*" status={404} component={PathNotFound} />
+                </Switch>
+            </Container>
         </React.Fragment>
     )
 }
