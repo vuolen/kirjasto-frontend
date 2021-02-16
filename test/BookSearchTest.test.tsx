@@ -13,13 +13,13 @@ it("BookSearch shows the titles of the books the api returns", () => {
     expect(queryByText(/Second Book/)).toBeTruthy()
 })
 
-it("BookSearch doesnt show a filtered book", () => {
+it("BookSearch doesnt show a book filtered by title", () => {
     const books = [{id: 1, title: "Test Book"}, {id: 2, title: "Second Book"}]
-    const {getByLabelText, queryByText, getByText} = render(
+    const {getByPlaceholderText, queryByText, getByText} = render(
         <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
     )
 
-    fireEvent.input(getByLabelText(/Search/i), {target: {value: "Sec"}})
+    fireEvent.input(getByPlaceholderText(/Search/i), {target: {value: "Sec"}})
 
 
     expect(queryByText(books[0].title)).toBeFalsy()

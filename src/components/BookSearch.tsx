@@ -1,53 +1,38 @@
 import React, { useState } from "react"
-import { BehaviorSubject, combineLatest, Observable } from "rxjs"
-import { filter, map, tap } from "rxjs/operators"
-import { List, Table } from "semantic-ui-react"
+import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs"
+import { concatMap, filter, map, tap } from "rxjs/operators"
+import { Label, Search, Table } from "semantic-ui-react"
 import { Api, Book, GetBooksResponse, isAPIError } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
-import { ObservableInput } from "./ObservableInput"
+import { ObservableInput, ObservableTableBody } from "./ObservableComponents"
 
-const BookSearch = ({api$}: {api$: Observable<Api>}) => {    
-
-    const [filter$] = useState(new BehaviorSubject(""))
-    const api = useObservable(api$, [api$])
-
-    if (api === undefined) {
-        return <Loading />
-    }
-
-    const {getBooks} = api
-
-    const book$ = getBooks().pipe(
+const BookSearch = ({api$}: {api$: Observable<Api>}) => {  
+    const book$ = api$.pipe(
+        concatMap(api => api.getBooks()),
         filter((res): res is GetBooksResponse => !isAPIError(res))
     )
 
+    const titleFilter = new BehaviorSubject("")
+
     return <div>
         <h1>Kirjasto</h1>
-        <label htmlFor="search-bar">Search:</label>
-        <ObservableInput value$={filter$} id="search-bar" />
-        <BookTable book$={book$} filter$={filter$} />
+        <ObservableInput placeholder="Search..." id="title" data-cy="search" onChange={titleFilter} />
+        <BookTable book$={book$} filter$={titleFilter} />
     </div>
 }
 
 const BookTable = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filter$: Observable<string>}) => {
-    const filteredBooks = useObservable(
-        combineLatest([book$, filter$]).pipe(
-            map(([books, latestFilter]) => 
-                books
-                    .filter(
-                        book => book.title.includes(latestFilter)
-                    ).map(
-                        book => <BookItem key={book.id} book={book} />
-                    )),
+    const filteredBooks = combineLatest([book$, filter$]).pipe(
+        map(([books, latestFilter]) => 
+            books
+                .filter(
+                    book => book.title.includes(latestFilter)
+                ).map(
+                    book => <BookItem key={book.id} book={book} />
+                )
         ),
-        [book$, filter$]
     )
-
-    if (filteredBooks === undefined) {
-        return <Loading />
-    }
-
 
     return (
         <Table celled data-cy="books">
@@ -61,9 +46,7 @@ const BookTable = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filte
                     </Table.HeaderCell>
                 </Table.Row>
             </Table.Header>
-            <Table.Body>
-                {filteredBooks}
-            </Table.Body>
+            <ObservableTableBody children$={filteredBooks} />
         </Table>
     )
 }

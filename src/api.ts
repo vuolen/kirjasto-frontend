@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import { BehaviorSubject, from, Observable, of, ReplaySubject, Subject, throwError } from "rxjs";
+import { useState } from "react";
+import { BehaviorSubject, from, Observable, of } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { catchError, concatMap, map } from "rxjs/operators";
-import AddBook from "./components/AddBook";
 import { useAuth0 } from "./hooks/useAuth0";
 
 export type APIError = {error: string}
@@ -34,7 +33,7 @@ const addBook = (token: string) => (params: AddBookRequest): Observable<APIError
          "Authorization": "Bearer " + token}
     ).pipe(
         map(
-            response => response.response
+            response => response.response as APIError | AddBookResponse
         ),
         catchError(
             err => {
