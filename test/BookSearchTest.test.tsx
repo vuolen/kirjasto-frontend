@@ -24,3 +24,28 @@ it("BookSearch doesnt show a book filtered by title", () => {
 
     expect(queryByText(books[0].title)).toBeFalsy()
 })
+
+
+it("BookSearch shows a book searched by author", () => {
+    const books = [{id: 1, title: "Test Book", author: {id: 1, name: "Test Author"}}]
+    const {getByPlaceholderText, queryByText} = render(
+        <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
+    )
+
+    fireEvent.input(getByPlaceholderText(/Search/i), {target: {value: "Author"}})
+
+
+    expect(queryByText(books[0].title)).toBeTruthy()
+})
+
+it("BookSearch doesnt show a book filtered by author", () => {
+    const books = [{id: 1, title: "Test Book", author: {id: 1, name: "Test Author"}}]
+    const {getByPlaceholderText, queryByText} = render(
+        <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
+    )
+
+    fireEvent.input(getByPlaceholderText(/Search/i), {target: {value: "Different Author"}})
+
+
+    expect(queryByText(books[0].title)).toBeFalsy()
+})

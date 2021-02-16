@@ -27,7 +27,7 @@ const BookTable = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filte
         map(([books, latestFilter]) => 
             books
                 .filter(
-                    book => book.title.includes(latestFilter)
+                    book => book.title.includes(latestFilter) || (book.author && book.author.name.includes(latestFilter))
                 ).map(
                     book => <BookItem key={book.id} book={book} />
                 )
