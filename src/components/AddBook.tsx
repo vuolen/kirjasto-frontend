@@ -1,68 +1,85 @@
 import React, { useState } from "react"
 import { FormEvent } from "react"
-import { BehaviorSubject, merge, Observable, Subject } from "rxjs"
-import { concatMap, filter, map, mapTo, startWith, tap, withLatestFrom } from "rxjs/operators"
-import { Button, Form, FormInputProps, Message, MessageProps } from "semantic-ui-react"
-import { SemanticCOLORS } from "semantic-ui-react/dist/commonjs/generic"
-import { APIError, isAPIError, AuthenticatedApi } from "../api"
+import { Observable, Subject } from "rxjs"
+import { concatMap, filter, map, tap } from "rxjs/operators"
+import { APIError, isAPIError, AuthenticatedApi, GetAuthorsResponse, AddBookResponse } from "../api"
 import useObservable from "../hooks/useObservable"
-import { withObservableProps } from "../util"
 import { Loading } from "./Loading"
-import { ObservableFormInput, ObservableMessage } from "./ObservableComponents"
+import { ObservableAlert, ObservableSelect } from "./ObservableComponents"
+import 'antd/dist/antd.css';
+import { Form, Input, Button, Alert, AlertProps } from "antd"
 
-const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook">>}) => {
-    const [title$] = useState(new BehaviorSubject<string>(""))
-    const [author$] = useState(new BehaviorSubject<string>(""))
+const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "getAuthors">>}) => {
     const api = useObservable(api$, [api$])
+    const [form] = Form.useForm()
+
     if (api === undefined) {
         return <Loading />
     }
 
-    const submit$ = new Subject<FormEvent>()
+    const {addBook, getAuthors} = api
 
-    const {addBook} = api
+    const authors$ = getAuthors()
+
+    const submit$ = new Subject<any>()
 
     const response$ = submit$.pipe(
-        tap(ev => ev.preventDefault()),
-        withLatestFrom(title$, author$),
-        concatMap(([_, title, author]) => 
-            addBook({
-                title, 
-                author: author === "" ? undefined : {name: author}
+        concatMap(({title, author}) => {
+            return addBook({
+                title,
+                // TODO: make more elegant
+                author: author === undefined ? undefined : typeof author[0] === "number" ? author[0] : {name: author[0]}
             })
-        ),
-        tap(() => title$.next("")),
-        tap(() => author$.next(""))
+        }),
     )
 
-    const messageProp$ = merge(
-        submit$.pipe(
-            mapTo({hidden: true})
-        ),
-        response$.pipe(
-            filter((res): res is APIError => isAPIError(res)),
-            map(res => ({
-                content: res.error,
-                hidden: false
-            }))
-        )
+    const messageProps$ = response$.pipe(
+        map(res => {
+            if (!isAPIError(res)) {
+                form.resetFields()
+                return {message: "Book added successfully", type: "success" as AlertProps["type"]}
+            } else {
+                return {message: res.error, type: "error" as AlertProps["type"]}
+            }
+        }),
+    )
+
+    const authorOptions$ = authors$.pipe(
+        filter((res): res is GetAuthorsResponse => !isAPIError(res)),
+        map(authors => authors.map(
+            author => ({key: author.id, value: author.id, label: author.name})
+        ))
     )
 
     return <div>
         <h2>Add a new book</h2>
-        <Form error onSubmit={ev => submit$.next(ev)}>
-            <ObservableMessage error hidden color="red" data-cy="message" prop$={messageProp$}/>
-            <ObservableFormInput onChange={title$} value$={title$} id="title" label="Title:" name="title">
-                <input data-cy="title"></input>
-            </ObservableFormInput>
-            <ObservableFormInput onChange={author$} value$={author$} id="author" label="Author:" name="author">
-                <input data-cy="author"></input>
-            </ObservableFormInput>
-            <Form.Button data-cy="submit" type='submit'>Add</Form.Button>
+        <Form form={form} onFinish={val => submit$.next(val)}>
+            <Form.Item>
+                <ObservableAlert data-cy="message" message="" props$={messageProps$} />
+            </Form.Item>
+            <Form.Item
+                label="Title"
+                name="title">
+                <Input 
+                    id="title" data-cy="title" />
+            </Form.Item>
+            <Form.Item
+                label="Author"
+                name="author">
+                <ObservableSelect 
+                    mode="tags"
+                    optionFilterProp="label"
+                    data-cy="author"
+                    options$={authorOptions$}
+                    ></ObservableSelect>
+            </Form.Item>
+            <Form.Item>
+                <Button type="primary" htmlType="submit" data-cy="submit">
+                    Add
+                </Button>
+            </Form.Item>
         </Form>
     </div>
 }
-
-
 
 export default AddBook

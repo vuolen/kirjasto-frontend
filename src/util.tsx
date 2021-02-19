@@ -6,10 +6,10 @@ import { isArrayLiteralExpression } from "typescript"
 import useObservable from "./hooks/useObservable"
 
 export type ObservableProps<PropType> = {
-    [Key in keyof PropType as `${string & Key}$`]: Observable<PropType[Key]>;
-} & {prop$?: Observable<PropType>}
+    [Key in keyof PropType as `${string & Key}$`]?: Observable<PropType[Key]>;
+} & {props$?: Observable<PropType>}
 
-export type ObservedProps<PropType> = PropType & {prop?: PropType}
+export type ObservedProps<PropType> = PropType & {props?: PropType}
 
 /*
     This HOC allows the following cases:
@@ -26,6 +26,7 @@ export type ObservedProps<PropType> = PropType & {prop?: PropType}
 */
 export const withObservableProps = <P,>(Component: React.ComponentType<P>): React.FC<P & ObservableProps<P>> => 
     (props) => {
+        console.log("RENDER")
         const {normalProps, observableProps} = Object.entries(props).reduce(
             (obj, [key, value]) => {
                 if (key.endsWith("$")) {
@@ -46,27 +47,28 @@ export const withObservableProps = <P,>(Component: React.ComponentType<P>): Reac
                     }
                 }
             },
-            {normalProps: {} as P, observableProps: {} as ObservableProps<P> & {prop?: Observable<P>}}
+            {normalProps: {} as P, observableProps: {} as ObservableProps<P> & {props?: Observable<P>}}
         )
 
         const [finalProps, setFinalProps] = useState(normalProps)
 
         useEffect(() => {
             const subscription = combineLatest(observableProps).subscribe(
-                ({prop, ...observedProps}) => {
-                    setFinalProps({...normalProps, ...observedProps, ...(prop !== undefined ? prop : {})})
+                ({props, ...observedProps}) => {
+                    setFinalProps({...normalProps, ...observedProps, ...(props !== undefined ? props : {})})
                 }
             )
 
+            return () => subscription.unsubscribe()
         }, Object.values(observableProps))
-
+        console.log(finalProps)
         return props === undefined ? null : <Component {...finalProps}></Component>
     }
     
 
 export const withSubjectAsOnChange = <P,>(Component: React.ComponentType<P>): React.FC<Omit<P, "onChange"> & {onChange?: Subject<any>}> => 
-    ({onChange, ...rest}) => (
-        <Component 
-            onChange={(_: any, data: any) => onChange ? onChange.next(data.value) : undefined} 
+    ({onChange, ...rest}) => {
+        return <Component 
+            onChange={(...args: any[]) => onChange ? onChange.next(args) : undefined}
             {...rest as P}></Component>
-    )
+    }

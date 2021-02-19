@@ -12,6 +12,7 @@ export function isAPIError(response: any): response is APIError {
 
 export interface Api {
     getBooks: () => Observable<APIError | GetBooksResponse>
+    getAuthors: () => Observable<APIError | GetAuthorsResponse>
 }
 
 export interface AuthenticatedApi extends Api {
@@ -24,7 +25,7 @@ const getBooks = () =>
     ajax.getJSON<APIError | GetBooksResponse>("api/books")
 
 type AddBookRequest = {title: string, author?: number | {name: string}}
-type AddBookResponse = {id: number, title: string, author?: {id: number, title: string}}
+export type AddBookResponse = {id: number, title: string, author?: {id: number, title: string}}
 const addBook = (token: string) => (params: AddBookRequest): Observable<APIError | AddBookResponse> => 
     ajax.post(
         "/api/books/",
@@ -43,11 +44,16 @@ const addBook = (token: string) => (params: AddBookRequest): Observable<APIError
         )
     )
 
+export type GetAuthorsResponse = {id: number, name: string}[]
+const getAuthors = () => 
+    ajax.getJSON<APIError | GetAuthorsResponse>("api/authors")
+
 export function useApi(): {api$: Observable<Api | AuthenticatedApi>, isAuthenticated: boolean, isLoading: boolean} {
     const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
 
     const [baseApi$] = useState(new BehaviorSubject<Api>({
-        getBooks
+        getBooks,
+        getAuthors
     }))
 
     const e2eToken = window.localStorage.getItem("access_token")

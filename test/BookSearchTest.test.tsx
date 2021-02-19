@@ -1,51 +1,57 @@
-import { fireEvent, getByLabelText, prettyDOM, render, waitForElementToBeRemoved } from "@testing-library/react"
+import { fireEvent, getByLabelText, prettyDOM, render, RenderResult, waitFor, waitForElementToBeRemoved } from "@testing-library/preact"
 import React from "react"
 import { of } from "rxjs"
 import BookSearch from "../src/components/BookSearch"
+import "./matchMedia.js"
+
+const search = async (res: RenderResult, searchString: string) => {
+    const search = await res.findByPlaceholderText(/Search/i)
+    fireEvent.input(search, {target: {value: searchString}})
+    fireEvent.keyDown(search, { key: 'Enter', keyCode: 13 })
+}
 
 it("BookSearch shows the titles of the books the api returns", () => {
     const books = [{id: 1, title: "Test Book"}, {id: 2, title: "Second Book"}]
-    const {queryByText} = render(
+    const {findByText} = render(
         <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
     )
 
-    expect(queryByText(/Test Book/)).toBeTruthy()
-    expect(queryByText(/Second Book/)).toBeTruthy()
+    expect(findByText(/Test Book/)).toBeTruthy()
+    expect(findByText(/Second Book/)).toBeTruthy()
 })
 
-it("BookSearch doesnt show a book filtered by title", () => {
+it("BookSearch doesnt show a book filtered by title", async () => {
     const books = [{id: 1, title: "Test Book"}, {id: 2, title: "Second Book"}]
-    const {getByPlaceholderText, queryByText, getByText} = render(
+    const res = render(
         <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
     )
 
-    fireEvent.input(getByPlaceholderText(/Search/i), {target: {value: "Sec"}})
+    search(res, "Sec")
 
 
-    expect(queryByText(books[0].title)).toBeFalsy()
+    await waitFor(() => expect(res.queryByText(books[0].title)).toBeFalsy())
 })
 
 
-it("BookSearch shows a book searched by author", () => {
+it("BookSearch shows a book searched by author", async () => {
     const books = [{id: 1, title: "Test Book", author: {id: 1, name: "Test Author"}}]
-    const {getByPlaceholderText, queryByText} = render(
+    const res = render(
         <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
     )
 
-    fireEvent.input(getByPlaceholderText(/Search/i), {target: {value: "Author"}})
+    search(res, "Sec")
 
-
-    expect(queryByText(books[0].title)).toBeTruthy()
+    await waitFor(() => expect(res.queryByText(books[0].title)).toBeTruthy())
 })
 
-it("BookSearch doesnt show a book filtered by author", () => {
+it("BookSearch doesnt show a book filtered by author", async () => {
     const books = [{id: 1, title: "Test Book", author: {id: 1, name: "Test Author"}}]
-    const {getByPlaceholderText, queryByText} = render(
+    const res = render(
         <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
     )
 
-    fireEvent.input(getByPlaceholderText(/Search/i), {target: {value: "Different Author"}})
+    search(res, "Sec")
 
 
-    expect(queryByText(books[0].title)).toBeFalsy()
+    await waitFor(() => expect(res.queryByText(books[0].title)).toBeFalsy())
 })

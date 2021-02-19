@@ -1,24 +1,25 @@
+import { Input } from "antd"
 import React, { useState } from "react"
 import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs"
-import { concatMap, filter, map, tap } from "rxjs/operators"
+import { concatMap, filter, map, startWith, tap } from "rxjs/operators"
 import { Label, Search, Table } from "semantic-ui-react"
 import { Api, Book, GetBooksResponse, isAPIError } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
-import { ObservableInput, ObservableTableBody } from "./ObservableComponents"
+import { ObservableTableBody } from "./ObservableComponents"
 
-const BookSearch = ({api$}: {api$: Observable<Api>}) => {  
+const BookSearch = ({api$}: {api$: Observable<Pick<Api, "getBooks">>}) => {  
     const book$ = api$.pipe(
         concatMap(api => api.getBooks()),
         filter((res): res is GetBooksResponse => !isAPIError(res))
     )
 
-    const titleFilter = new BehaviorSubject("")
+    const searchInput$ = new BehaviorSubject("")
 
     return <div>
         <h1>Kirjasto</h1>
-        <ObservableInput placeholder="Search..." id="title" data-cy="search" onChange={titleFilter} />
-        <BookTable book$={book$} filter$={titleFilter} />
+        <Input.Search placeholder="Search..." id="title" data-cy="search" onSearch={val => searchInput$.next(val)}></Input.Search>
+        <BookTable book$={book$} filter$={searchInput$} />
     </div>
 }
 
