@@ -15,12 +15,18 @@ export type ObservedProps<PropType> = PropType & {props?: PropType}
     This HOC allows the following cases:
     1) Passing a prop normally
     2) Passing a prop as an observable
-    3) Passing multiple props as an observable of a prop
+    3) Passing multiple props as an observable of an object
     4) Any mix of the previous three
 
     Every normal prop gets a duplicate prop with "$" appended to the end:
     For example a component with the prop "colour" now has a new prop "colour$", which
     takes an observable of the values "colour" normally receives.
+
+    If for example you'd like to always update the size of the component along with the colour,
+    you could pass in the prop `prop$` which takes an observable of an object,
+    eg. `{colour: "blue", size: "large"}`
+    PLEASE NOTE THAT AT THE MOMENT THIS DOES CLASH IF YOUR BASE COMPONENT HAS A 
+    PROP NAMED "props"
 
     If the same prop is defined in multiple cases, the precedence is the same as the previous list's order
 */
@@ -64,7 +70,12 @@ export const withObservableProps = <P,>(Component: React.ComponentType<P>): Reac
         return props === undefined ? null : <Component {...finalProps}></Component>
     }
     
-
+/*
+    This HOC allows you to pass a subject as the `onChange` callback to a component.
+    This subject receives a value every time the base component triggers its `onChange` event.
+    Currently this overrides the original prop, which means you cannot pass in both a function
+    and a subject.
+*/
 export const withSubjectAsOnChange = <P,>(Component: React.ComponentType<P>): React.FC<Omit<P, "onChange"> & {onChange?: Subject<any>}> => 
     ({onChange, ...rest}) => {
         return <Component 
