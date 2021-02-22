@@ -26,7 +26,6 @@ export type ObservedProps<PropType> = PropType & {props?: PropType}
 */
 export const withObservableProps = <P,>(Component: React.ComponentType<P>): React.FC<P & ObservableProps<P>> => 
     (props) => {
-        console.log("RENDER")
         const {normalProps, observableProps} = Object.entries(props).reduce(
             (obj, [key, value]) => {
                 if (key.endsWith("$")) {
@@ -61,7 +60,7 @@ export const withObservableProps = <P,>(Component: React.ComponentType<P>): Reac
 
             return () => subscription.unsubscribe()
         }, Object.values(observableProps))
-        console.log(finalProps)
+
         return props === undefined ? null : <Component {...finalProps}></Component>
     }
     

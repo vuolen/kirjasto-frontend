@@ -67,6 +67,7 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "
                 label="Author"
                 name="author">
                 <ObservableSelect 
+                    id="author"
                     mode="tags"
                     optionFilterProp="label"
                     data-cy="author"
