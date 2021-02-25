@@ -1,17 +1,26 @@
 import { Input } from "antd"
+import { pipe } from "fp-ts/lib/function"
 import React, { useState } from "react"
 import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs"
 import { concatMap, filter, map, startWith, tap } from "rxjs/operators"
-import { Label, Search, Table } from "semantic-ui-react"
-import { Api, Book, GetBooksResponse, isAPIError } from "../api"
-import useObservable from "../hooks/useObservable"
-import { Loading } from "./Loading"
+import { Table } from "semantic-ui-react"
+import { Api, Book } from "../api"
+import { GetBooksResponse } from "../shared/api/GetBooks"
 import { ObservableTableBody } from "./ObservableComponents"
+import * as O from "fp-ts-rxjs/lib/Observable"
+import * as E from "fp-ts/lib/Either"
+
 
 const BookSearch = ({api$}: {api$: Observable<Pick<Api, "getBooks">>}) => {  
-    const book$ = api$.pipe(
-        concatMap(api => api.getBooks()),
-        filter((res): res is GetBooksResponse => !isAPIError(res))
+    const book$ = pipe(
+        api$,
+        O.chain(
+            api => api.getBooks()
+        ),
+        O.filter(E.isRight),
+        O.map(
+            books => books.right
+        )
     )
 
     const searchInput$ = new BehaviorSubject("")

@@ -2,12 +2,13 @@ import React, { useState } from "react"
 import { FormEvent } from "react"
 import { Observable, Subject } from "rxjs"
 import { concatMap, filter, map, tap } from "rxjs/operators"
-import { APIError, isAPIError, AuthenticatedApi, GetAuthorsResponse, AddBookResponse } from "../api"
+import { AuthenticatedApi, GetAuthorsResponse, AddBookResponse } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
 import { ObservableAlert, ObservableSelect } from "./ObservableComponents"
 import 'antd/dist/antd.css';
 import { Form, Input, Button, Alert, AlertProps } from "antd"
+import { APIError } from "../shared/api/APIError"
 
 const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "getAuthors">>}) => {
     const api = useObservable(api$, [api$])
@@ -35,7 +36,7 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "
 
     const messageProps$ = response$.pipe(
         map(res => {
-            if (!isAPIError(res)) {
+            if (!APIError.is(res)) {
                 form.resetFields()
                 return {message: "Book added successfully", type: "success" as AlertProps["type"]}
             } else {
@@ -45,7 +46,7 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "
     )
 
     const authorOptions$ = authors$.pipe(
-        filter((res): res is GetAuthorsResponse => !isAPIError(res)),
+        filter((res): res is GetAuthorsResponse => !APIError.is(res)),
         map(authors => authors.map(
             author => ({key: author.id, value: author.id, label: author.name})
         ))

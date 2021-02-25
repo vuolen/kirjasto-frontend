@@ -1,8 +1,10 @@
 import { fireEvent, getByLabelText, prettyDOM, render, RenderResult, waitFor, waitForElementToBeRemoved } from "@testing-library/preact"
 import React from "react"
 import { of } from "rxjs"
+import * as E from "fp-ts/lib/Either"
 import BookSearch from "../src/components/BookSearch"
 import "./matchMedia.js"
+import { GetBooksResponse } from "../src/shared/api/GetBooks"
 
 const search = async (res: RenderResult, searchString: string) => {
     const search = await res.findByPlaceholderText(/Search/i)
@@ -11,9 +13,9 @@ const search = async (res: RenderResult, searchString: string) => {
 }
 
 it("BookSearch shows the titles of the books the api returns", () => {
-    const books = [{id: 1, title: "Test Book"}, {id: 2, title: "Second Book"}]
+    const books = [{id: 1, title: "Test Book"}, {id: 2, title: "Second Book"}] as GetBooksResponse
     const {findByText} = render(
-        <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
+        <BookSearch api$={of({getBooks: () => of(E.right(books))})}></BookSearch>
     )
 
     expect(findByText(/Test Book/)).toBeTruthy()
@@ -21,9 +23,9 @@ it("BookSearch shows the titles of the books the api returns", () => {
 })
 
 it("BookSearch doesnt show a book filtered by title", async () => {
-    const books = [{id: 1, title: "Test Book"}, {id: 2, title: "Second Book"}]
+    const books = [{id: 1, title: "Test Book"}, {id: 2, title: "Second Book"}] as GetBooksResponse
     const res = render(
-        <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
+        <BookSearch api$={of({getBooks: () => of(E.right(books))})}></BookSearch>
     )
 
     search(res, "Sec")
@@ -34,9 +36,9 @@ it("BookSearch doesnt show a book filtered by title", async () => {
 
 
 it("BookSearch shows a book searched by author", async () => {
-    const books = [{id: 1, title: "Test Book", author: {id: 1, name: "Test Author"}}]
+    const books = [{id: 1, title: "Test Book", author: {id: 1, name: "Test Author"}}] as GetBooksResponse
     const res = render(
-        <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
+        <BookSearch api$={of({getBooks: () => of(E.right(books))})}></BookSearch>
     )
 
     search(res, "Sec")
@@ -45,9 +47,9 @@ it("BookSearch shows a book searched by author", async () => {
 })
 
 it("BookSearch doesnt show a book filtered by author", async () => {
-    const books = [{id: 1, title: "Test Book", author: {id: 1, name: "Test Author"}}]
+    const books = [{id: 1, title: "Test Book", author: {id: 1, name: "Test Author"}}] as GetBooksResponse
     const res = render(
-        <BookSearch api$={of({getBooks: () => of(books)})}></BookSearch>
+        <BookSearch api$={of({getBooks: () => of(E.right(books))})}></BookSearch>
     )
 
     search(res, "Sec")

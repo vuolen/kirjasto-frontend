@@ -3,15 +3,18 @@ import { BehaviorSubject, from, Observable, of } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { catchError, concatMap, map } from "rxjs/operators";
 import { useAuth0 } from "./hooks/useAuth0";
+import { GetBooksResponse } from "./shared/api/GetBooks";
+import * as O from 'fp-ts-rxjs/lib/Observable'
+import * as E from 'fp-ts/lib/Either'
+import { flow, pipe } from "fp-ts/lib/function";
+import { APIResponse } from "./shared/api/APIResponse";
+import { APIError } from "./shared/api/APIError";
+import { failure } from 'io-ts/PathReporter'
 
-export type APIError = {error: string}
-
-export function isAPIError(response: any): response is APIError {
-    return response.error !== undefined
-}
+import Either = E.Either
 
 export interface Api {
-    getBooks: () => Observable<APIError | GetBooksResponse>
+    getBooks: () => Observable<Either<string, GetBooksResponse>>
     getAuthors: () => Observable<APIError | GetAuthorsResponse>
 }
 
@@ -20,9 +23,25 @@ export interface AuthenticatedApi extends Api {
 }
 
 export type Book = {id: number, title: string, author?: {id: number, name: string}}
-export type GetBooksResponse = {id: number, title: string, author?: {id: number, name: string}}[]
-const getBooks = () => 
-    ajax.getJSON<APIError | GetBooksResponse>("api/books")
+const getBooks: Api["getBooks"] = () => 
+    pipe(
+        ajax.getJSON<any>("api/books"),
+        O.map(
+            res => pipe(
+                res,
+                GetBooksResponse.decode,
+                E.mapLeft(
+                    errors => {
+                        if (APIError.is(res)) {
+                            return res.error
+                        }
+                        console.log(new Error(JSON.stringify(failure(errors))))
+                        return "Something went wrong. Please try again or inform an administrator."
+                    }
+                )
+            )
+        ),
+    )
 
 type AddBookRequest = {title: string, author?: number | {name: string}}
 export type AddBookResponse = {id: number, title: string, author?: {id: number, title: string}}
