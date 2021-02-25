@@ -8,7 +8,7 @@ import { Loading } from "./Loading"
 import { ObservableAlert, ObservableSelect } from "./ObservableComponents"
 import 'antd/dist/antd.css';
 import { Form, Input, Button, Alert, AlertProps } from "antd"
-import { APIError } from "../shared/api/APIError"
+import { APIError } from "kirjasto-shared"
 
 const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "getAuthors">>}) => {
     const api = useObservable(api$, [api$])

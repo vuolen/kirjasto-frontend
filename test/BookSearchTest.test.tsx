@@ -4,7 +4,7 @@ import { of } from "rxjs"
 import * as E from "fp-ts/lib/Either"
 import BookSearch from "../src/components/BookSearch"
 import "./matchMedia.js"
-import { GetBooksResponse } from "../src/shared/api/GetBooks"
+import { GetBooksResponse } from "kirjasto-shared"
 
 const search = async (res: RenderResult, searchString: string) => {
     const search = await res.findByPlaceholderText(/Search/i)

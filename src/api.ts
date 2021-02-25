@@ -3,12 +3,10 @@ import { BehaviorSubject, from, Observable, of } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { catchError, concatMap, map } from "rxjs/operators";
 import { useAuth0 } from "./hooks/useAuth0";
-import { GetBooksResponse } from "./shared/api/GetBooks";
 import * as O from 'fp-ts-rxjs/lib/Observable'
 import * as E from 'fp-ts/lib/Either'
 import { flow, pipe } from "fp-ts/lib/function";
-import { APIResponse } from "./shared/api/APIResponse";
-import { APIError } from "./shared/api/APIError";
+import { GetBooksResponse, APIError } from "kirjasto-shared";
 import { failure } from 'io-ts/PathReporter'
 
 import Either = E.Either

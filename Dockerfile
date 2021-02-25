@@ -1,9 +1,10 @@
 FROM node:latest AS dev
 WORKDIR /usr/src/app
 ENV NODE_ENV="development"
-COPY ["package.json", "package-lock.json", "./"]
-RUN npm install
-COPY . .
+COPY frontend frontend
+COPY shared shared
+WORKDIR /usr/src/app/frontend
+RUN npm install --unsafe-perm
 CMD npm run development
 
 FROM dev as prod-build
