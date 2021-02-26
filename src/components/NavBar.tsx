@@ -1,8 +1,8 @@
 import { useAuth0 } from "../hooks/useAuth0"
 import React from "react"
 import { Link } from "react-router-dom"
-import { Button, ButtonProps, Menu } from "semantic-ui-react";
 import { Loading } from "./Loading";
+import { Button, ButtonProps, Menu } from "antd";
 
 const NavBar = () => {
 
@@ -13,9 +13,9 @@ const NavBar = () => {
     }
 
     return (
-      <Menu>
-        <Menu.Item as={Link} to="/">Home</Menu.Item>
-        <Menu.Item as={Link} to="/addBook">Add book</Menu.Item>
+      <Menu mode="horizontal">
+        <Menu.Item><Link to="/">Home</Link></Menu.Item>
+        <Menu.Item><Link to="/addBook">Add book</Link></Menu.Item>
         
         {isAuthenticated ?
             <LogoutButton /> : <LoginButton />}
@@ -27,7 +27,7 @@ const LoginButton = (props: ButtonProps) => {
     const { loginWithRedirect } = useAuth0();
   
     return (
-      <Button {...props} id="login" onClick={() => loginWithRedirect()}>
+      <Button {...props} data-cy="login" onClick={() => loginWithRedirect()}>
         Log In
       </Button>
     );
@@ -37,7 +37,7 @@ const LogoutButton = (props: ButtonProps) => {
     const { logout } = useAuth0();
   
     return (
-      <Button {...props} floated="right" id="logout" onClick={() => logout({ returnTo: window.location.origin })}>
+      <Button {...props} data-cy="logout" onClick={() => logout({ returnTo: window.location.origin })}>
         Log Out
       </Button>
     );

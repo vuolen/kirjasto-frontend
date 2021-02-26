@@ -6,7 +6,6 @@ import { AuthenticatedApi, GetAuthorsResponse, AddBookResponse } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
 import { ObservableAlert, ObservableSelect } from "./ObservableComponents"
-import 'antd/dist/antd.css';
 import { Form, Input, Button, Alert, AlertProps } from "antd"
 import { APIError } from "kirjasto-shared"
 

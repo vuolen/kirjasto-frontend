@@ -10,15 +10,8 @@ import BookSearch from "./components/BookSearch"
 import { Loading } from "./components/Loading"
 import NavBar from "./components/NavBar"
 import PathNotFound from "./components/PathNotFound"
-
-
-/* import 'semantic-ui-css/components/table.min.css'
-import 'semantic-ui-css/components/message.min.css'
-import 'semantic-ui-css/components/form.min.css'
-import 'semantic-ui-css/components/menu.min.css'
-import 'semantic-ui-css/components/dropdown.min.css' */
-import 'semantic-ui-css/semantic.min.css'
-import { Container } from "semantic-ui-react"
+import 'antd/dist/antd.compact.css';
+import { Layout } from "antd"
 
 const App = () => {
 
@@ -37,16 +30,16 @@ const App = () => {
     }
 
     return (
-        <React.Fragment>
+        <Layout style={{height: "100%", padding: "10px"}}>
             <NavBar />
-            <Container>
+            <Layout.Content>
                 <Switch>
                     <Route exact path="/" render={() => <BookSearch api$={api$} />} />
                     <ProtectedRoute path="/addBook" component={AddBook} /> {/* TODO: Make more elegant */}
                     <Route path="*" status={404} component={PathNotFound} />
                 </Switch>
-            </Container>
-        </React.Fragment>
+            </Layout.Content>
+        </Layout>
     )
 }
 
