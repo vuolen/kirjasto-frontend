@@ -1,14 +1,14 @@
-import { Input } from "antd"
+import { Input, Table } from "antd"
 import { pipe } from "fp-ts/lib/function"
 import React, { useState } from "react"
 import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs"
 import { concatMap, filter, map, startWith, tap } from "rxjs/operators"
-import { Table } from "semantic-ui-react"
 import { Api, Book } from "../api"
 import { GetBooksResponse } from "kirjasto-shared"
-import { ObservableTableBody } from "./ObservableComponents"
+import { ObservableTable } from "./ObservableComponents"
 import * as O from "fp-ts-rxjs/lib/Observable"
 import * as E from "fp-ts/lib/Either"
+import { ColumnsType, ColumnType } from "antd/lib/table"
 
 
 const BookSearch = ({api$}: {api$: Observable<Pick<Api, "getBooks">>}) => {  
@@ -33,39 +33,32 @@ const BookSearch = ({api$}: {api$: Observable<Pick<Api, "getBooks">>}) => {
 }
 
 const BookTable = ({book$, filter$}: {book$: Observable<GetBooksResponse>, filter$: Observable<string>}) => {
+    interface Row {
+        key: number
+        title: string
+        author: string
+    }
+
     const filteredBooks = combineLatest([book$, filter$]).pipe(
         map(([books, latestFilter]) => 
             books
                 .filter(
                     book => book.title.includes(latestFilter) || (book.author && book.author.name.includes(latestFilter))
                 ).map(
-                    book => <BookItem key={book.id} book={book} />
+                    book => ({key: book.id, title: book.title, author: book.author ? book.author.name : ""}) as Row
                 )
         ),
     )
 
+    const columns: ColumnsType<Row> = [
+        {title: "Title", dataIndex: "title", key: "title"},
+        {title: "Author", dataIndex: "author", key: "author"}
+    ]
+
     return (
-        <Table celled data-cy="books">
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell>
-                        Title
-                    </Table.HeaderCell>
-                    <Table.HeaderCell>
-                        Author
-                    </Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
-            <ObservableTableBody children$={filteredBooks} />
-        </Table>
+        <ObservableTable pagination={false} columns={columns as ColumnsType<object>} dataSource$={filteredBooks} data-cy="books">
+        </ObservableTable>
     )
 }
-
-const BookItem = ({book}: {book: Book}) => (
-    <Table.Row data-cy="book">
-        <Table.Cell data-cy="title">{book.title}</Table.Cell>
-        <Table.Cell data-cy="author">{book.author ? book.author.name : ""}</Table.Cell>
-    </Table.Row>
-)
 
 export default BookSearch
