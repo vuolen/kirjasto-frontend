@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "preinstall": "cd ../shared && npm pack && cd ../frontend && npm i kirjasto-shared",
     "build": "webpack --config webpack.prod.js",
     "development": "webpack serve --port=${PORT} --config ./webpack.dev.js",
     "test": "jest --env=jsdom"
