@@ -12,6 +12,6 @@ ENV NODE_ENV="production"
 RUN npm run build
 
 FROM nginx:latest as prod
-COPY --from=prod-build /usr/src/app/dist /usr/share/nginx/html
-COPY --from=prod-build /usr/src/app/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=prod-build /usr/src/app/frontend/dist /usr/share/nginx/html
+COPY --from=prod-build /usr/src/app/frontend/nginx.conf.template /etc/nginx/templates/default.conf.template
 EXPOSE 80
