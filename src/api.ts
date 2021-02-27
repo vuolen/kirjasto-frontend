@@ -6,21 +6,20 @@ import { useAuth0 } from "./hooks/useAuth0";
 import * as O from 'fp-ts-rxjs/lib/Observable'
 import * as E from 'fp-ts/lib/Either'
 import { flow, pipe } from "fp-ts/lib/function";
-import { GetBooksResponse, APIError } from "kirjasto-shared";
+import { GetBooksResponse, GetAuthorsResponse, APIError } from "kirjasto-shared";
 import { failure } from 'io-ts/PathReporter'
 
 import Either = E.Either
 
 export interface Api {
     getBooks: () => Observable<Either<string, GetBooksResponse>>
-    getAuthors: () => Observable<APIError | GetAuthorsResponse>
+    getAuthors: () => Observable<Either<string, GetAuthorsResponse>>
 }
 
 export interface AuthenticatedApi extends Api {
     addBook: (params: AddBookRequest) => Observable<APIError | AddBookResponse>
 }
 
-export type Book = {id: number, title: string, author?: {id: number, name: string}}
 const getBooks: Api["getBooks"] = () => 
     pipe(
         ajax.getJSON<any>("api/books"),
@@ -61,9 +60,25 @@ const addBook = (token: string) => (params: AddBookRequest): Observable<APIError
         )
     )
 
-export type GetAuthorsResponse = {id: number, name: string}[]
 const getAuthors = () => 
-    ajax.getJSON<APIError | GetAuthorsResponse>("api/authors")
+    pipe(
+        ajax.getJSON<any>("api/authors"),
+        O.map(
+            res => pipe(
+                res,
+                GetAuthorsResponse.decode,
+                E.mapLeft(
+                    errors => {
+                        if (APIError.is(res)) {
+                            return res.error
+                        }
+                        console.log(new Error(JSON.stringify(failure(errors))))
+                        return "Something went wrong. Please try again or inform an administrator."
+                    }
+                )
+            )
+        ),
+    )
 
 export function useApi(): {api$: Observable<Api | AuthenticatedApi>, isAuthenticated: boolean, isLoading: boolean} {
     const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();

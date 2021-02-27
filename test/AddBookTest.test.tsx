@@ -3,6 +3,8 @@ import React from "react"
 import { Observable, of } from "rxjs"
 import AddBook from "../src/components/AddBook"
 import "./matchMedia.js"
+import * as OE from "fp-ts-rxjs/ObservableEither"
+import { Author } from 'kirjasto-shared';
 
 /**
  * @jest-environment jsdom
@@ -32,7 +34,7 @@ const unimpl = () => { throw new Error("Unimplemented") }
  it("AddBook clears the form after submitting", async () => {
     const mockApi = {
         addBook: jest.fn(() => of({id: 1, title: "Test Book"})),
-        getAuthors: () => of([])
+        getAuthors: () => OE.right([])
     }
 
     const result = render(
@@ -50,7 +52,7 @@ const unimpl = () => { throw new Error("Unimplemented") }
 it("AddBook calls the api on submit", async () => {
     const mockApi = {
         addBook: jest.fn(() => of({id: 1, title: "Test Book"})),
-        getAuthors: () => of([])
+        getAuthors: () => OE.right([])
     }
 
     const result = render(
@@ -63,10 +65,10 @@ it("AddBook calls the api on submit", async () => {
     await waitFor(() => expect(mockApi.addBook.mock.calls.length).toBe(1))
 })
 
-it("Given the API returns an error, when the user adds a book, AddBook shows that error", async () => {
+it("Given the addBook returns an error, when the user adds a book, AddBook shows that error", async () => {
     const mockApi = of({
         addBook: () => of({error: "API Error"}),
-        getAuthors: () => of([])
+        getAuthors: () => OE.right([])
     })
 
     const result = render(
@@ -91,7 +93,7 @@ it("Given no API has been provided, AddBook shows that it is loading", async () 
 
 it("When typing, the author field should suggest authors", async () => {
     const mockApi = {
-        getAuthors: jest.fn(() => of([{id: 1, name: "Test Author"}])),
+        getAuthors: jest.fn(() => OE.right([{id: 1, name: "Test Author"} as Author])),
         addBook: unimpl
     }
 

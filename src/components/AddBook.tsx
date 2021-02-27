@@ -2,12 +2,20 @@ import React, { useState } from "react"
 import { FormEvent } from "react"
 import { Observable, Subject } from "rxjs"
 import { concatMap, filter, map, tap } from "rxjs/operators"
-import { AuthenticatedApi, GetAuthorsResponse, AddBookResponse } from "../api"
+import { AuthenticatedApi, AddBookResponse } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
 import { ObservableAlert, ObservableSelect } from "./ObservableComponents"
 import { Form, Input, Button, Alert, AlertProps } from "antd"
-import { APIError } from "kirjasto-shared"
+import { APIError, GetAuthorsResponse } from "kirjasto-shared"
+import * as E from "fp-ts/lib/Either"
+import * as O from "fp-ts-rxjs/Observable"
+import { flow, pipe } from "fp-ts/lib/function"
+
+const trace = <T,>(log: string) => (val: T) => {
+    console.log(log, val)
+    return val
+}
 
 const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "getAuthors">>}) => {
     const api = useObservable(api$, [api$])
@@ -18,8 +26,6 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "
     }
 
     const {addBook, getAuthors} = api
-
-    const authors$ = getAuthors()
 
     const submit$ = new Subject<any>()
 
@@ -43,12 +49,18 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "
             }
         }),
     )
-
-    const authorOptions$ = authors$.pipe(
-        filter((res): res is GetAuthorsResponse => !APIError.is(res)),
-        map(authors => authors.map(
-            author => ({key: author.id, value: author.id, label: author.name})
-        ))
+    
+    const authorOptions$ = pipe(
+        getAuthors(),
+        O.map(
+            E.fold(
+                err => {
+                    console.log(err)
+                    return []
+                },
+                authors => authors.map(author => ({key: author.id, value: author.id, label: author.name}))
+            )
+        )
     )
 
     return <div>

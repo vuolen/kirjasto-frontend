@@ -1,14 +1,14 @@
-import { Input, Table } from "antd"
-import { pipe } from "fp-ts/lib/function"
-import React, { useState } from "react"
-import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs"
-import { concatMap, filter, map, startWith, tap } from "rxjs/operators"
-import { Api, Book } from "../api"
-import { GetBooksResponse } from "kirjasto-shared"
-import { ObservableTable } from "./ObservableComponents"
+import { Input } from "antd"
+import { ColumnsType } from "antd/lib/table"
 import * as O from "fp-ts-rxjs/lib/Observable"
 import * as E from "fp-ts/lib/Either"
-import { ColumnsType, ColumnType } from "antd/lib/table"
+import { pipe } from "fp-ts/lib/function"
+import { GetBooksResponse } from "kirjasto-shared"
+import React from "react"
+import { BehaviorSubject, combineLatest, Observable } from "rxjs"
+import { map } from "rxjs/operators"
+import { Api } from "../api"
+import { ObservableTable } from "./ObservableComponents"
 
 
 const BookSearch = ({api$}: {api$: Observable<Pick<Api, "getBooks">>}) => {  
