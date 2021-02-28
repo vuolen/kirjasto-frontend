@@ -4,6 +4,7 @@ The frontend for the [kirjasto](https://github.com/vuolen/kirjasto) library mana
 
 # Documentation
 This project uses
+- [Typescript](https://www.typescriptlang.org/) for type safety
 - [Preact](https://preactjs.com/) for the UI (used identically to React)
 - [Ant Design](https://ant.design/) for common UI components and styling
 - [RxJS](https://rxjs-dev.firebaseapp.com/guide/overview) for observables
