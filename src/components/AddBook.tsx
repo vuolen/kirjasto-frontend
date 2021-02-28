@@ -42,10 +42,10 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "
     const messageProps$ = pipe(
         response$,
         OE.fold(
-            err => O.of({message: err, type: "error" as AlertProps["type"]}),
+            err => O.of({message: err, type: "error" as AlertProps["type"], style: {}}),
             res => {
                 form.resetFields()
-                return O.of({message: "Book added successfully", type: "success" as AlertProps["type"]})
+                return O.of({message: "Book added successfully", type: "success" as AlertProps["type"], style: {}})
             }
         )
     )
@@ -65,7 +65,7 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "
         <h2>Add a new book</h2>
         <Form form={form} onFinish={val => submit$.next(val)}>
             <Form.Item>
-                <ObservableAlert data-cy="message" message="" props$={messageProps$} />
+                <ObservableAlert data-cy="message" message="" style={{display: "none"}} props$={messageProps$} />
             </Form.Item>
             <Form.Item
                 label="Title"
