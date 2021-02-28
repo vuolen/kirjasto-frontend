@@ -1,6 +1,6 @@
 
 import { Alert, Input, Select, Table } from "antd"
-import { withObservableProps } from "../util"
+import { withObservableProps } from "../hocs/withObservableProps"
 
 export const ObservableSearch = withObservableProps(Input.Search)
 
