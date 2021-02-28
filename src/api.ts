@@ -1,14 +1,14 @@
+import * as O from 'fp-ts-rxjs/lib/Observable';
+import * as E from 'fp-ts/lib/Either';
+import { flow, pipe } from "fp-ts/lib/function";
+import * as t from "io-ts";
+import { failure } from 'io-ts/PathReporter';
+import { AddBookRequest, AddBookResponse, APIError, GetAuthorsResponse, GetBooksResponse } from "kirjasto-shared";
 import { useState } from "react";
 import { BehaviorSubject, from, Observable, of } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { catchError, concatMap, map } from "rxjs/operators";
 import { useAuth0 } from "./hooks/useAuth0";
-import * as O from 'fp-ts-rxjs/lib/Observable'
-import * as E from 'fp-ts/lib/Either'
-import { flow, pipe } from "fp-ts/lib/function";
-import { GetBooksResponse, GetAuthorsResponse, APIError, AddBookRequest, AddBookResponse } from "kirjasto-shared";
-import { failure } from 'io-ts/PathReporter'
-import * as t from "io-ts";
 
 import Either = E.Either
 

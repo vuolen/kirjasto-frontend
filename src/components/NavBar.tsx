@@ -1,8 +1,8 @@
-import { useAuth0 } from "../hooks/useAuth0"
-import React from "react"
-import { Link } from "react-router-dom"
-import { Loading } from "./Loading";
 import { Button, ButtonProps, Menu } from "antd";
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth0 } from "../hooks/useAuth0";
+import { Loading } from "./Loading";
 
 const NavBar = () => {
 

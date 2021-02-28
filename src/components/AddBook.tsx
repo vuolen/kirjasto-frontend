@@ -1,21 +1,14 @@
-import React, { useState } from "react"
-import { FormEvent } from "react"
+import { AlertProps, Button, Form, Input } from "antd"
+import * as O from "fp-ts-rxjs/Observable"
+import * as OE from "fp-ts-rxjs/ObservableEither"
+import { pipe } from "fp-ts/lib/function"
+import React from "react"
 import { Observable, Subject } from "rxjs"
-import { concatMap, filter, map, startWith, tap } from "rxjs/operators"
+import { concatMap } from "rxjs/operators"
 import { AuthenticatedApi } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
 import { ObservableAlert, ObservableSelect } from "./ObservableComponents"
-import { Form, Input, Button, Alert, AlertProps } from "antd"
-import { APIError, GetAuthorsResponse } from "kirjasto-shared"
-import * as OE from "fp-ts-rxjs/ObservableEither"
-import * as O from "fp-ts-rxjs/Observable"
-import { flow, pipe } from "fp-ts/lib/function"
-
-const trace = <T,>(log: string) => (val: T) => {
-    console.log(log, val)
-    return val
-}
 
 const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "getAuthors">>}) => {
     const api = useObservable(api$, [api$])

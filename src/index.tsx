@@ -35,7 +35,7 @@ const App = () => {
             <Layout.Content>
                 <Switch>
                     <Route exact path="/" render={() => <BookSearch api$={api$} />} />
-                    <ProtectedRoute path="/addBook" component={AddBook} /> {/* TODO: Make more elegant */}
+                    <ProtectedRoute path="/addBook" component={AddBook} />
                     <Route path="*" status={404} component={PathNotFound} />
                 </Switch>
             </Layout.Content>
