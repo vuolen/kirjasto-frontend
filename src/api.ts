@@ -6,7 +6,7 @@ import { useAuth0 } from "./hooks/useAuth0";
 import * as O from 'fp-ts-rxjs/lib/Observable'
 import * as E from 'fp-ts/lib/Either'
 import { flow, pipe } from "fp-ts/lib/function";
-import { GetBooksResponse, GetAuthorsResponse, APIError } from "kirjasto-shared";
+import { GetBooksResponse, GetAuthorsResponse, APIError, AddBookRequest, AddBookResponse } from "kirjasto-shared";
 import { failure } from 'io-ts/PathReporter'
 
 import Either = E.Either
@@ -17,12 +17,12 @@ export interface Api {
 }
 
 export interface AuthenticatedApi extends Api {
-    addBook: (params: AddBookRequest) => Observable<APIError | AddBookResponse>
+    addBook: (params: AddBookRequest) => Observable<Either<string, AddBookResponse>>
 }
 
 const getBooks: Api["getBooks"] = () => 
     pipe(
-        ajax.getJSON<any>("api/books"),
+        ajax.getJSON("api/books"),
         O.map(
             res => pipe(
                 res,
@@ -40,29 +40,36 @@ const getBooks: Api["getBooks"] = () =>
         ),
     )
 
-type AddBookRequest = {title: string, author?: number | {name: string}}
-export type AddBookResponse = {id: number, title: string, author?: {id: number, title: string}}
-const addBook = (token: string) => (params: AddBookRequest): Observable<APIError | AddBookResponse> => 
-    ajax.post(
-        "/api/books/",
-        params,
-        {"Content-Type": "application/json",
-         "Authorization": "Bearer " + token}
-    ).pipe(
-        map(
-            response => response.response as APIError | AddBookResponse
+const addBook = (token: string): AuthenticatedApi["addBook"] => 
+    (params) => pipe(
+        ajax.post("/api/books/",
+                    params,
+                    {"Content-Type": "application/json",
+                    "Authorization": "Bearer " + token}),
+        catchError(err => of(err)),
+        O.map(
+            res => res.response
         ),
-        catchError(
-            err => {
-                console.log("Error in api call addBook, " + err)
-                return of({error: err.response.error || "Failed to add book"})
-            }
-        )
+        O.map(
+            res => pipe(
+                res,
+                AddBookResponse.decode,
+                E.mapLeft(
+                    errors => {
+                        if (APIError.is(res)) {
+                            return res.error
+                        }
+                        console.log(new Error(JSON.stringify(failure(errors))))
+                        return "Something went wrong. Please try again or inform an administrator."
+                    }
+                )
+            )
+        ),
     )
 
 const getAuthors = () => 
     pipe(
-        ajax.getJSON<any>("api/authors"),
+        ajax.getJSON("api/authors"),
         O.map(
             res => pipe(
                 res,

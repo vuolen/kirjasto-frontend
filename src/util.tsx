@@ -67,6 +67,8 @@ export const withObservableProps = <P,>(Component: React.ComponentType<P>): Reac
             return () => subscription.unsubscribe()
         }, Object.values(observableProps))
 
+        console.log(finalProps)
+
         return props === undefined ? null : <Component {...finalProps}></Component>
     }
     

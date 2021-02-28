@@ -1,14 +1,14 @@
 import React, { useState } from "react"
 import { FormEvent } from "react"
 import { Observable, Subject } from "rxjs"
-import { concatMap, filter, map, tap } from "rxjs/operators"
-import { AuthenticatedApi, AddBookResponse } from "../api"
+import { concatMap, filter, map, startWith, tap } from "rxjs/operators"
+import { AuthenticatedApi } from "../api"
 import useObservable from "../hooks/useObservable"
 import { Loading } from "./Loading"
 import { ObservableAlert, ObservableSelect } from "./ObservableComponents"
 import { Form, Input, Button, Alert, AlertProps } from "antd"
 import { APIError, GetAuthorsResponse } from "kirjasto-shared"
-import * as E from "fp-ts/lib/Either"
+import * as OE from "fp-ts-rxjs/ObservableEither"
 import * as O from "fp-ts-rxjs/Observable"
 import { flow, pipe } from "fp-ts/lib/function"
 
@@ -39,27 +39,25 @@ const AddBook = ({api$}: {api$: Observable<Pick<AuthenticatedApi, "addBook" | "
         }),
     )
 
-    const messageProps$ = response$.pipe(
-        map(res => {
-            if (!APIError.is(res)) {
+    const messageProps$ = pipe(
+        response$,
+        OE.fold(
+            err => O.of({message: err, type: "error" as AlertProps["type"]}),
+            res => {
                 form.resetFields()
-                return {message: "Book added successfully", type: "success" as AlertProps["type"]}
-            } else {
-                return {message: res.error, type: "error" as AlertProps["type"]}
+                return O.of({message: "Book added successfully", type: "success" as AlertProps["type"]})
             }
-        }),
+        )
     )
     
     const authorOptions$ = pipe(
         getAuthors(),
-        O.map(
-            E.fold(
-                err => {
-                    console.log(err)
-                    return []
-                },
-                authors => authors.map(author => ({key: author.id, value: author.id, label: author.name}))
-            )
+        OE.fold(
+            err => {
+                console.log(err)
+                return O.of([])
+            },
+            authors => O.of(authors.map(author => ({key: author.id, value: author.id, label: author.name})))
         )
     )
 

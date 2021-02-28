@@ -4,7 +4,8 @@ import { Observable, of } from "rxjs"
 import AddBook from "../src/components/AddBook"
 import "./matchMedia.js"
 import * as OE from "fp-ts-rxjs/ObservableEither"
-import { Author } from 'kirjasto-shared';
+import { APIError, Author, Book } from 'kirjasto-shared';
+import { AuthenticatedApi } from '../src/api';
 
 /**
  * @jest-environment jsdom
@@ -33,7 +34,7 @@ const unimpl = () => { throw new Error("Unimplemented") }
 
  it("AddBook clears the form after submitting", async () => {
     const mockApi = {
-        addBook: jest.fn(() => of({id: 1, title: "Test Book"})),
+        addBook: jest.fn(() => OE.right({id: 1, title: "Test Book"} as Book)),
         getAuthors: () => OE.right([])
     }
 
@@ -51,7 +52,7 @@ const unimpl = () => { throw new Error("Unimplemented") }
 
 it("AddBook calls the api on submit", async () => {
     const mockApi = {
-        addBook: jest.fn(() => of({id: 1, title: "Test Book"})),
+        addBook: jest.fn(() => OE.right({id: 1, title: "Test Book"} as Book)),
         getAuthors: () => OE.right([])
     }
 
@@ -67,9 +68,9 @@ it("AddBook calls the api on submit", async () => {
 
 it("Given the addBook returns an error, when the user adds a book, AddBook shows that error", async () => {
     const mockApi = of({
-        addBook: () => of({error: "API Error"}),
+        addBook: (params) => OE.left("API Error"),
         getAuthors: () => OE.right([])
-    })
+    } as AuthenticatedApi)
 
     const result = render(
         <AddBook api$={mockApi}></AddBook>
