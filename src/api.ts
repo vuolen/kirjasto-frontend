@@ -8,6 +8,7 @@ import * as E from 'fp-ts/lib/Either'
 import { flow, pipe } from "fp-ts/lib/function";
 import { GetBooksResponse, GetAuthorsResponse, APIError, AddBookRequest, AddBookResponse } from "kirjasto-shared";
 import { failure } from 'io-ts/PathReporter'
+import * as t from "io-ts";
 
 import Either = E.Either
 
@@ -20,23 +21,31 @@ export interface AuthenticatedApi extends Api {
     addBook: (params: AddBookRequest) => Observable<Either<string, AddBookResponse>>
 }
 
+const decodeAPIResponse = <A, O>(responseType: t.Type<A, O, unknown>) => 
+    flow(
+        t.union([responseType, APIError]).decode,
+        E.mapLeft(
+            errors => {
+                console.log(new Error(JSON.stringify(failure(errors))))
+                return "Something went wrong. Please try again or inform an administrator."
+            }
+        ),
+        E.chainW(
+            res => pipe(
+                res,
+                responseType.decode,
+                E.mapLeft(
+                    _ => (res as APIError).error
+                )
+            )
+        )
+    )
+
 const getBooks: Api["getBooks"] = () => 
     pipe(
         ajax.getJSON("api/books"),
         O.map(
-            res => pipe(
-                res,
-                GetBooksResponse.decode,
-                E.mapLeft(
-                    errors => {
-                        if (APIError.is(res)) {
-                            return res.error
-                        }
-                        console.log(new Error(JSON.stringify(failure(errors))))
-                        return "Something went wrong. Please try again or inform an administrator."
-                    }
-                )
-            )
+            decodeAPIResponse(GetBooksResponse)
         ),
     )
 
@@ -51,19 +60,7 @@ const addBook = (token: string): AuthenticatedApi["addBook"] =>
             res => res.response
         ),
         O.map(
-            res => pipe(
-                res,
-                AddBookResponse.decode,
-                E.mapLeft(
-                    errors => {
-                        if (APIError.is(res)) {
-                            return res.error
-                        }
-                        console.log(new Error(JSON.stringify(failure(errors))))
-                        return "Something went wrong. Please try again or inform an administrator."
-                    }
-                )
-            )
+            decodeAPIResponse(AddBookResponse)
         ),
     )
 
@@ -71,19 +68,7 @@ const getAuthors = () =>
     pipe(
         ajax.getJSON("api/authors"),
         O.map(
-            res => pipe(
-                res,
-                GetAuthorsResponse.decode,
-                E.mapLeft(
-                    errors => {
-                        if (APIError.is(res)) {
-                            return res.error
-                        }
-                        console.log(new Error(JSON.stringify(failure(errors))))
-                        return "Something went wrong. Please try again or inform an administrator."
-                    }
-                )
-            )
+            decodeAPIResponse(GetAuthorsResponse)
         ),
     )
 
