@@ -40,7 +40,7 @@
     "io-ts": "^2.2.16",
     "io-ts-types": "^0.5.15",
     "kirjasto-shared": "github:vuolen/kirjasto-shared",
-    "monocle-ts": "^2.3.7",
+    "monocle-ts": "^2.3.8",
     "newtype-ts": "^0.3.4",
     "preact": "^10.5.12",
     "react-router-dom": "^5.2.0",
