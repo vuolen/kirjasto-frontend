@@ -30,7 +30,7 @@
     "webpack-merge": "^5.7.3"
   },
   "dependencies": {
-    "@auth0/auth0-react": "^1.2.0",
+    "@auth0/auth0-react": "^1.4.0",
     "@testing-library/preact": "^2.0.1",
     "antd": "^4.14.1",
     "compression-webpack-plugin": "^7.1.2",
