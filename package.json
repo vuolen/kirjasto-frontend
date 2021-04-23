@@ -34,7 +34,7 @@
     "@testing-library/preact": "^2.0.1",
     "antd": "^4.15.1",
     "compression-webpack-plugin": "^7.1.2",
-    "fp-ts": "^2.10.0",
+    "fp-ts": "^2.10.3",
     "fp-ts-rxjs": "^0.6.13",
     "html-webpack-plugin": "^5.3.1",
     "io-ts": "^2.2.16",
