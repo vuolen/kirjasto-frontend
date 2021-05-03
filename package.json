@@ -32,7 +32,7 @@
   "dependencies": {
     "@auth0/auth0-react": "^1.4.0",
     "@testing-library/preact": "^2.0.1",
-    "antd": "^4.15.3",
+    "antd": "^4.15.4",
     "compression-webpack-plugin": "^7.1.2",
     "fp-ts": "^2.10.4",
     "fp-ts-rxjs": "^0.6.13",
