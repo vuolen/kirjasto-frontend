@@ -38,7 +38,7 @@
     "fp-ts-rxjs": "^0.6.13",
     "html-webpack-plugin": "^5.3.2",
     "io-ts": "^2.2.16",
-    "io-ts-types": "^0.5.15",
+    "io-ts-types": "^0.5.16",
     "kirjasto-shared": "github:vuolen/kirjasto-shared",
     "monocle-ts": "^2.3.10",
     "newtype-ts": "^0.3.4",
